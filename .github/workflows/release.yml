@@ -21,6 +21,10 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    - name: Build with Maven
+      shell: pwsh
+      run: mvn -B package --file pom.xml
+
     - name: Show files.
       run: |
         echo Showing current directory:
