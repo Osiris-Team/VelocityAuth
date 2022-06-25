@@ -13,7 +13,7 @@ public class Config extends Yaml {
     public YamlSection whitelistMode;
 
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
-        super(new File(Main.INSTANCE.dataDirectory+"/config.dyml"));
+        super(new File(Main.INSTANCE.dataDirectory+"/config.yml"));
         this.load();
         databaseUsername = this.put("database", "username");
         databasePassword = this.put("database", "password");
