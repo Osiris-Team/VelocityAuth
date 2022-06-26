@@ -6,7 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
-public final class RegisterUserCommand implements SimpleCommand {
+public final class AdminRegisterCommand implements Command {
 
     @Override
     public void execute(final Invocation invocation) {
@@ -31,7 +31,17 @@ public final class RegisterUserCommand implements SimpleCommand {
     }
 
     @Override
-    public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("velocityauth.registeruser");
+    public String command() {
+        return "aregister";
+    }
+
+    @Override
+    public String[] aliases() {
+        return new String[0];
+    }
+
+    @Override
+    public String permission() {
+        return "velocityauth.admin.register";
     }
 }

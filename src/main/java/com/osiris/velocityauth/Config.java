@@ -21,7 +21,8 @@ public class Config extends Yaml {
                 .setDefValues("false")
                 .setComments("If true, not registered players will be blocked from joining the server (proxy).",
                         "Note that in this case your players will have to register themselves",
-                        "over another platform, like a website for example.");
+                        "over another platform, like a website for example.",
+                        "If you proxy is in offline mode people are able to bypass this by naming themselves like registered users.");
         this.save();
     }
 }

@@ -18,6 +18,8 @@ public class RegisteredUser{
                 s.executeUpdate("ALTER TABLE `RegisteredUser` MODIFY IF EXISTS username TEXT NOT NULL");
                 s.executeUpdate("ALTER TABLE `RegisteredUser` ADD COLUMN IF NOT EXISTS password TEXT NOT NULL");
                 s.executeUpdate("ALTER TABLE `RegisteredUser` MODIFY IF EXISTS password TEXT NOT NULL");
+                s.executeUpdate("ALTER TABLE `RegisteredUser` ADD COLUMN IF NOT EXISTS isLoggedIn TINYINT");
+                s.executeUpdate("ALTER TABLE `RegisteredUser` MODIFY IF EXISTS isLoggedIn TINYINT");
             }
             try (PreparedStatement ps = con.prepareStatement("SELECT id FROM `RegisteredUser` ORDER BY id DESC LIMIT 1")) {
                 ResultSet rs = ps.executeQuery();
@@ -36,6 +38,14 @@ public class RegisteredUser{
         this.id = id;this.username = username;this.password = password;
     }
     /**
+     Use the static create method instead of this constructor,
+     if you plan to add this object to the database in the future, since
+     that method fetches and sets/reserves the {@link #id}.
+     */
+    public RegisteredUser (int id, String username, String password, byte isLoggedIn){
+        this.id = id;this.username = username;this.password = password;this.isLoggedIn = isLoggedIn;
+    }
+    /**
      Database field/value. Not null. <br>
      */
     public int id;
@@ -48,12 +58,23 @@ public class RegisteredUser{
      */
     public String password;
     /**
+     Database field/value. <br>
+     */
+    public byte isLoggedIn;
+    /**
      Increments the id and sets it for this object (basically reserves a space in the database).
      @return object with latest id. Should be added to the database next by you.
      */
     public static RegisteredUser create( String username, String password) {
         int id = idCounter.incrementAndGet();
         RegisteredUser obj = new RegisteredUser(id, username, password);
+        return obj;
+    }
+
+    public static RegisteredUser create( String username, String password, byte isLoggedIn) {
+        int id = idCounter.incrementAndGet();
+        RegisteredUser obj = new RegisteredUser();
+        obj.id=id; obj.username=username; obj.password=password; obj.isLoggedIn=isLoggedIn;
         return obj;
     }
 
@@ -79,7 +100,7 @@ public class RegisteredUser{
     public static List<RegisteredUser> get(String where, Object... whereValues) throws Exception {
         List<RegisteredUser> list = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT id,username,password" +
+                "SELECT id,username,password,isLoggedIn" +
                         " FROM `RegisteredUser`" +
                         (where != null ? ("WHERE "+where) : ""))) {
             if(where!=null && whereValues!=null)
@@ -94,6 +115,7 @@ public class RegisteredUser{
                 obj.id = rs.getInt(1);
                 obj.username = rs.getString(2);
                 obj.password = rs.getString(3);
+                obj.isLoggedIn = rs.getByte(4);
             }
         }
         return list;
@@ -106,10 +128,11 @@ public class RegisteredUser{
      */
     public static void update(RegisteredUser obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "UPDATE `RegisteredUser` SET id=?,username=?,password=?")) {
+                "UPDATE `RegisteredUser` SET id=?,username=?,password=?,isLoggedIn=?")) {
             ps.setInt(1, obj.id);
             ps.setString(2, obj.username);
             ps.setString(3, obj.password);
+            ps.setByte(4, obj.isLoggedIn);
             ps.executeUpdate();
         }
     }
@@ -119,10 +142,11 @@ public class RegisteredUser{
      */
     public static void add(RegisteredUser obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO `RegisteredUser` (id,username,password) VALUES (?,?,?)")) {
+                "INSERT INTO `RegisteredUser` (id,username,password,isLoggedIn) VALUES (?,?,?,?)")) {
             ps.setInt(1, obj.id);
             ps.setString(2, obj.username);
             ps.setString(3, obj.password);
+            ps.setByte(4, obj.isLoggedIn);
             ps.executeUpdate();
         }
     }
@@ -153,7 +177,8 @@ public class RegisteredUser{
     }
 
     public RegisteredUser clone(){
-        return new RegisteredUser(this.id,this.username,this.password);
+        return new RegisteredUser(this.id,this.username,this.password,this.isLoggedIn);
     }
 }
+
 

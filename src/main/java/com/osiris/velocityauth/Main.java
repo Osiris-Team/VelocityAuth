@@ -6,17 +6,19 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
-import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -84,16 +86,43 @@ public class Main {
                 ex.printStackTrace();
             }
         });
+        server.getEventManager().register(this, ServerConnectedEvent.class, PostOrder.FIRST, e -> {
+            try{
+                int maxSeconds = 60;
+                for (int i = maxSeconds; i >= 0; i--) {
+                    if(!e.getPlayer().isActive() || isRegistered(e.getPlayer().getUsername())) break;
+                    e.getPlayer().sendActionBar(Component.text(i+" seconds remaining to: /register <password> <confirm-password>",
+                            TextColor.color(184, 25, 43)));
+                    if(i == 0){
+                        e.getPlayer().disconnect(Component.text("Please register within "+maxSeconds+" seconds after joining the server.",
+                                TextColor.color(184, 25, 43)));
+                    }
+                    Thread.sleep(1000);
+                }
+                for (int i = maxSeconds; i >= 0; i--) {
+                    if(!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername())) break;
+                    e.getPlayer().sendActionBar(Component.text(i+" seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
+                    if(i == 0){
+                        e.getPlayer().disconnect(Component.text("Please login within "+maxSeconds+" seconds after joining the server.",
+                                TextColor.color(184, 25, 43)));
+                    }
+                    Thread.sleep(1000);
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
         logger.info("Listeners registered.");
 
-
-        server.getCommandManager().register(server.getCommandManager()
-                .metaBuilder("velocityauth register")
-                .build(), new RegisterUserCommand());
-        server.getCommandManager().register(server.getCommandManager()
-                .metaBuilder("velocityauth login")
-                .build(), new LoginUserCommand());
+        new AdminRegisterCommand().register();
+        new AdminLoginCommand().register();
         logger.info("Commands registered.");
+    }
+
+    private boolean isLoggedIn(String username) throws Exception {
+        List<RegisteredUser> registeredUsers = RegisteredUser.get("username=?", username);
+        if(registeredUsers.isEmpty()) return false;
+        return registeredUsers.get(0).isLoggedIn == 1;
     }
 
     private Player findPlayerByUsername(String username) {

@@ -5,7 +5,7 @@ import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
-public final class LoginUserCommand implements SimpleCommand {
+public final class AdminLoginCommand implements Command {
 
     @Override
     public void execute(final Invocation invocation) {
@@ -31,7 +31,17 @@ public final class LoginUserCommand implements SimpleCommand {
     }
 
     @Override
-    public boolean hasPermission(final Invocation invocation) {
-        return invocation.source().hasPermission("velocityauth.loginuser");
+    public String command() {
+        return "alogin";
+    }
+
+    @Override
+    public String[] aliases() {
+        return new String[0];
+    }
+
+    @Override
+    public String permission() {
+        return "velocityauth.admin.login";
     }
 }
