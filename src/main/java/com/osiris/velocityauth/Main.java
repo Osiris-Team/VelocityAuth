@@ -11,6 +11,7 @@ import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -80,13 +81,23 @@ public class Main {
         logger.info("Database connected.");
 
 
-        server.getEventManager().register(this, LoginEvent.class, PostOrder.FIRST, e -> {
+        server.getEventManager().register(this, PreLoginEvent.class, PostOrder.FIRST, e -> {
             try {
-                if(isWhitelistMode && !isRegistered(e.getPlayer().getUsername())){
-                    e.setResult(ResultedEvent.ComponentResult.denied(
+                if(findPlayerByUsername(e.getUsername()) != null){
+                    // Means that there is already another player online with this username
+                    e.setResult(PreLoginEvent.PreLoginComponentResult.denied(
+                            Component.text("Another player named '"+e.getUsername()+"' is currently connected!")
+                    ));
+                    logger.info("Blocked connection for "+e.getUsername()+". Another player with this username is currently connected.");
+                    return;
+                }
+
+                if(isWhitelistMode && !isRegistered(e.getUsername())){
+                    e.setResult(PreLoginEvent.PreLoginComponentResult.denied(
                             Component.text("You must be registered to join this server!")
                     ));
-                    logger.info("Blocked connection for "+e.getPlayer().getUsername()+". Player not registered.");
+                    logger.info("Blocked connection for "+e.getUsername()+". Player not registered (whitelist-mode).");
+                    return;
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
