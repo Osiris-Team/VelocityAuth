@@ -69,6 +69,8 @@ public class Main {
             config.save();
         }
 
+        Database.rawUrl = config.databaseRawUrl.asString();
+        Database.url = config.databaseUrl.asString();
         Database.username = config.databaseUsername.asString();
         Database.password = config.databasePassword.asString();
         isWhitelistMode = config.whitelistMode.asBoolean();

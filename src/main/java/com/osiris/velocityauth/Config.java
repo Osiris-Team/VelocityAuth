@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class Config extends Yaml {
+    public YamlSection databaseRawUrl;
+    public YamlSection databaseUrl;
     public YamlSection databaseUsername;
     public YamlSection databasePassword;
     public YamlSection whitelistMode;
@@ -15,6 +17,8 @@ public class Config extends Yaml {
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
         super(new File(Main.INSTANCE.dataDirectory+"/config.yml"));
         this.load();
+        databaseRawUrl = this.put("database", "raw-url").setDefValues(Database.rawUrl);
+        databaseUrl = this.put("database", "url").setDefValues(Database.url);
         databaseUsername = this.put("database", "username");
         databasePassword = this.put("database", "password");
         whitelistMode = this.put("whitelist-mode").setCountTopLineBreaks(1)
