@@ -1,0 +1,14 @@
+groups:
+  admin:
+    - limboserver.stop
+    - limboserver.kick
+    - limboserver.say
+    - limboserver.gamemode
+  default:
+    - limboserver.spawn
+    - limboserver.chat
+    - limboserver.version
+
+players:
+  LOOHP: 
+    - admin

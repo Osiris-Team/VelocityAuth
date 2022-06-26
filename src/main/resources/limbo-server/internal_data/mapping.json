@@ -1,0 +1,63 @@
+{
+  "HandshakeIn": {
+    "0x00": "PacketHandshakingIn"
+  },
+  "LoginIn": {
+    "0x00": "PacketLoginInLoginStart",
+    "0x02": "PacketLoginInPluginMessaging"
+  },
+  "LoginOut": {
+    "PacketLoginOutLoginSuccess": "0x02",
+    "PacketLoginOutDisconnect": "0x00",
+    "PacketLoginOutPluginMessaging": "0x04"
+  },
+  "PlayIn": {
+    "0x11": "PacketPlayInKeepAlive",
+    "0x03": "ServerboundChatCommandPacket",
+    "0x04": "PacketPlayInChat",
+    "0x14": "PacketPlayInPositionAndLook",
+    "0x13": "PacketPlayInPosition",
+    "0x15": "PacketPlayInRotation",
+    "0x0C": "PacketPlayInPluginMessaging",
+    "0x08": "PacketPlayInTabComplete",
+    "0x27": "PacketPlayInHeldItemChange",
+    "0x23": "PacketPlayInResourcePackStatus"
+  },
+  "PlayOut": {
+    "PacketPlayOutLogin": "0x23",
+    "PacketPlayOutPositionAndLook": "0x36",
+    "PacketPlayOutSpawnPosition": "0x4A",
+    "ClientboundPlayerChatPacket": "0x30",
+    "ClientboundSystemChatPacket": "0x5F",
+    "PacketPlayOutPlayerAbilities": "0x2F",
+    "ClientboundLevelChunkWithLightPacket": "0x1F",
+    "PacketPlayOutUnloadChunk": "0x1A",
+    "PacketPlayOutKeepAlive": "0x1E",
+    "PacketPlayOutPlayerInfo": "0x34",
+    "PacketPlayOutUpdateViewPosition": "0x48",
+    "PacketPlayOutDisconnect": "0x17",
+    "PacketPlayOutPluginMessaging": "0x15",
+    "PacketPlayOutTabComplete": "0x0E",
+    "PacketPlayOutDeclareCommands": "0x0F",
+    "PacketPlayOutRespawn": "0x3B",
+    "PacketPlayOutGameState": "0x1B",
+    "PacketPlayOutEntityDestroy": "0x38",
+    "PacketPlayOutEntityMetadata": "0x4D",
+    "PacketPlayOutSpawnEntity": "0x00",
+    "PacketPlayOutHeldItemChange": "0x47",
+    "PacketPlayOutPlayerListHeaderFooter": "0x60",
+    "PacketPlayOutResourcePackSend": "0x3A",
+    "ClientboundSetTitlesAnimationPacket": "0x5B",
+    "ClientboundSetTitleTextPacket": "0x5A",
+    "ClientboundSetSubtitleTextPacket": "0x58",
+    "ClientboundClearTitlesPacket": "0x0D"
+  },
+  "StatusIn": {
+    "0x01": "PacketStatusInPing",
+    "0x00": "PacketStatusInRequest"
+  },
+  "StatusOut": {
+    "PacketStatusOutResponse": "0x00",
+    "PacketStatusOutPong": "0x01"
+  }
+}
