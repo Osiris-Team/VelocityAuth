@@ -3,7 +3,10 @@ Authenticate players on your velocity server.
 
 ## Features
 - SQL database support.
-- Blocks players with the same username from joining and prevents kicking of already connected players (useful in offline mode).
+- Session based authentication.
+- Preconfigured and installed limbo auth-server.
+- Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
+- Prevents join blocking (username spoofing / can only happen in offline mode).
 - Whitelist mode to completely block not registered players from joining.
 
 ## Commands
