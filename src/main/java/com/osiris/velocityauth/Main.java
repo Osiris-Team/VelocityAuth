@@ -41,6 +41,7 @@ public class Main {
     public boolean isWhitelistMode = false;
     public final Path dataDirectory;
     public LimboServer limboServer;
+    public int sessionMaxHours;
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -79,6 +80,7 @@ public class Main {
         Database.username = config.databaseUsername.asString();
         Database.password = config.databasePassword.asString();
         isWhitelistMode = config.whitelistMode.asBoolean();
+        sessionMaxHours = config.sessionMaxHours.asInt();
         logger.info("Loaded configuration.");
 
         Database.create();

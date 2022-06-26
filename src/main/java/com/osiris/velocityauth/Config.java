@@ -13,6 +13,7 @@ public class Config extends Yaml {
     public YamlSection databaseUsername;
     public YamlSection databasePassword;
     public YamlSection whitelistMode;
+    public YamlSection sessionMaxHours;
 
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
         super(new File(Main.INSTANCE.dataDirectory+"/config.yml"));
@@ -32,15 +33,8 @@ public class Config extends Yaml {
         this.put("session").setCountTopLineBreaks(1).setComments("A session is created at successful player login and linked to the players ip.",
                 "Players won't have to re-login every time they join,",
                         " but only when their ip changes, or the session expires.");
-        this.put("session", "max-hours-valid").setDefValues("720").setComments("The maximum time (hours) a session is valid.",
+        sessionMaxHours = this.put("session", "max-hours-valid").setDefValues("720").setComments("The maximum time (hours) a session is valid.",
                 "Default is one month (30 days * 24h = 720h).");
-        this.put("session", "ip-limit").setDefValues("1").setComments("The maximum allowed number of ips for ");
-        // Peter(0) logged in and now playing, session = 0
-        // Peter(1) tries connect (gets blocked because Peter is online)
-        // Peter(0) logs out
-        // Peter(1) tries connect (stuck at login)
-        // Peter(0) tries connect (gets blocked because Peter is online)
-        // Problem: Legit Peter(0) can't join the game because fake Peter is online.
         this.save();
     }
 }

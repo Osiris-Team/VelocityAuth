@@ -6,6 +6,7 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 public final class AdminRegisterCommand implements Command {
@@ -18,18 +19,18 @@ public final class AdminRegisterCommand implements Command {
             source.sendMessage(Component.text("Failed! Requires 2 arguments: <username> <password>"));
             return;
         }
-        String username = args[0];
-        String password = args[1];
-        String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
         try {
-            RegisteredUser.add(
-                    RegisteredUser.create(username, encodedPassword));
+            String error = execute(args[0], args[1]);
+            if(error == null){
+                source.sendMessage(Component.text("Registration success!"));
+            } else {
+                source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
+                return;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            source.sendMessage(Component.text("Failed! Details could not be added to the database."));
-            return;
+            source.sendMessage(Component.text("Failed! "+e.getMessage(), TextColor.color(255, 0, 0)));
         }
-        source.sendMessage(Component.text("Success!"));
     }
 
     @Override
@@ -45,5 +46,20 @@ public final class AdminRegisterCommand implements Command {
     @Override
     public String permission() {
         return "velocityauth.admin.register";
+    }
+
+    @Override
+    public String execute(Object... args) throws Exception {
+        String username = (String) args[0];
+        String password = (String) args[1];
+        String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
+        try {
+            RegisteredUser.add(
+                    RegisteredUser.create(username, encodedPassword));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed! Details could not be added to the database.";
+        }
+        return null;
     }
 }

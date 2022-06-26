@@ -6,6 +6,7 @@ import com.osiris.velocityauth.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import java.util.Objects;
@@ -27,6 +28,11 @@ public class RegisterCommand implements Command {
     }
 
     @Override
+    public String execute(Object... args) throws Exception {
+        return null;
+    }
+
+    @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
@@ -42,13 +48,17 @@ public class RegisterCommand implements Command {
         }
         if(source instanceof Player){
             Player player = (Player) source;
-            String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
             try {
-                RegisteredUser.add(
-                        RegisteredUser.create(player.getUsername(), encodedPassword));
+                String error = new AdminRegisterCommand().execute(player.getUsername(), password);
+                if(error == null){
+                    source.sendMessage(Component.text("Registration success!"));
+                } else {
+                    source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
+                    return;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                source.sendMessage(Component.text("Failed! Details could not be added to the database."));
+                source.sendMessage(Component.text("Failed! "+e.getMessage(), TextColor.color(255, 0, 0)));
                 return;
             }
         } else
