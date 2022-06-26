@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-@Plugin(id = "velocityauth", name = "VelocityAuth", version = "0.1",
-        url = "https://github.com/Osiris-Team", description = "Auth manager for velocity.", authors = {"Osiris-Team"})
+@Plugin(id = "velocityauth", name = "VelocityAuth", version = "0.4",
+        url = "https://github.com/Osiris-Team", description = "Auth manager for velocity.", authors = {"Osiris-Team, HasX"})
 public class Main {
     public static Main INSTANCE;
 
