@@ -165,7 +165,7 @@ public class Main {
 
         limboServer = new LimboServer();
         limboServer.start();
-        logger.info("Started VelocityAuth limbo server.");
+        logger.info("Started limbo auth-server (localhost:"+limboServer.port+"/running:"+limboServer.process.isAlive()+").");
 
         logger.info("Initialised successfully!");
     }

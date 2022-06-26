@@ -33,7 +33,7 @@ public class LimboServer {
         if (!dir.exists() || dir.listFiles() == null || dir.listFiles().length == 0) {
             dir.mkdirs();
             try (ZipFile zip = new ZipFile(pluginJar)) {
-                zip.extractFile("limbo-server", dir.getAbsolutePath());
+                zip.extractFile("limbo-server/", pluginDir.getAbsolutePath()); // plugindir/limbo-server
             }
         }
 
@@ -42,14 +42,14 @@ public class LimboServer {
         try (BufferedReader reader = new BufferedReader(new FileReader(dir + "/server.properties"))) {
             properties.load(reader);
         }
-        properties.put("allow-flight", true);
-        properties.put("allow-chat", false);
-        properties.put("bungeecord", true);
+        properties.put("allow-flight", ""+true);
+        properties.put("allow-chat", ""+false);
+        properties.put("bungeecord", ""+true);
         properties.put("default-gamemode", "spectator");
-        properties.put("forwarding-secrets", new Toml().read(new File(pluginDir.getParentFile().getParentFile() + "/velocity.toml"))
+        properties.put("forwarding-secrets", new Toml().read(new File(pluginJar.getParentFile().getParentFile() + "/velocity.toml"))
                 .getString("forwarding-secret"));
-        properties.put("velocity-modern", true);
-        properties.put("server-port", port);
+        properties.put("velocity-modern", ""+true);
+        properties.put("server-port", ""+port);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/server.properties"))) {
             properties.store(writer, null);
         }
