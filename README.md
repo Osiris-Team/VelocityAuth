@@ -7,10 +7,18 @@ Authenticate players on your velocity server.
 
 ## Commands
 
-#### /velocityauth register <username> <password>
+#### /aregister _username_ _password_
 - Registers the provided player.
-- Permission: `velocityauth.registeruser`
+- Permission: `velocityauth.admin.register`
 
-#### /velocityauth login <username> <password>
+#### /alogin _username_ _password_
 - Logins the provided player.
-- Permission: `velocityauth.loginuser`
+- Permission: `velocityauth.admin.login`
+
+#### /register _password_ _confirm-password_
+- Registers the provided player.
+- Permission: `velocityauth.register`
+
+#### /login _password_
+- Logins the provided player.
+- Permission: `velocityauth.login`
