@@ -1,12 +1,9 @@
 package com.osiris.velocityauth;
 
 import com.google.inject.Inject;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.osiris.dyml.exceptions.*;
-import com.velocitypowered.api.command.CommandMeta;
-import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
@@ -16,7 +13,6 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -76,25 +72,18 @@ public class Main {
         logger.info("Database connected.");
 
 
-        if(server.getConfiguration().isOnlineMode())
-            server.getEventManager().register(this, LoginEvent.class, PostOrder.FIRST, e -> {
-                try {
-                    checkPlayer(e.getPlayer());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+        server.getEventManager().register(this, LoginEvent.class, PostOrder.FIRST, e -> {
+            try {
+                if(isWhitelistMode && !isRegistered(e.getPlayer().getUsername())){
+                    e.setResult(ResultedEvent.ComponentResult.denied(
+                            Component.text("You must be registered to join this server!")
+                    ));
+                    logger.info("Blocked connection for "+e.getPlayer().getUsername()+". Player not registered.");
                 }
-            });
-        else
-            server.getEventManager().register(this, PreLoginEvent.class, PostOrder.FIRST, e -> {
-                try {
-                    Player player = findPlayerByUsername(e.getUsername());
-                    if(player == null) throw new NullPointerException("Failed to find player" +
-                            " named '"+e.getUsername()+"', thus failed to block connection!");
-                    checkPlayer(player);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            });
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
         logger.info("Listeners registered.");
 
 
@@ -105,13 +94,6 @@ public class Main {
                 .metaBuilder("velocityauth login")
                 .build(), new LoginUserCommand());
         logger.info("Commands registered.");
-    }
-
-    private void checkPlayer(Player player) throws Exception {
-        if(isWhitelistMode && !isUsernameInTable(player.getUsername())){
-            player.disconnect(Component.text("You must be registered to join this server!"));
-            logger.info("Blocked connection for "+player.getUsername()+". Player not registered.");
-        }
     }
 
     private Player findPlayerByUsername(String username) {
@@ -125,7 +107,10 @@ public class Main {
         return player;
     }
 
-    public boolean isUsernameInTable(String username) throws Exception {
+    /**
+     * Checks whether the provided username exists in the database.
+     */
+    public boolean isRegistered(String username) throws Exception {
         return !RegisteredUser.get("username=?", username).isEmpty();
     }
 

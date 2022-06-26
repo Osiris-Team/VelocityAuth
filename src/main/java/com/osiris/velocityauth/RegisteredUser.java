@@ -134,12 +134,20 @@ public class RegisteredUser{
         remove("id = "+obj.id);
     }
     /**
+     Example: <br>
+     remove("username=?", "Peter"); <br>
      Deletes the objects that are found by the provided SQL WHERE statement, from the database.
+     @param whereValues can be null. Your SQL WHERE statement values to set for '?'.
      */
-    public static void remove(String where) throws Exception {
+    public static void remove(String where, Object... whereValues) throws Exception {
         java.util.Objects.requireNonNull(where);
         try (PreparedStatement ps = con.prepareStatement(
                 "DELETE FROM `RegisteredUser` WHERE "+where)) {
+            if(whereValues != null)
+                for (int i = 0; i < whereValues.length; i++) {
+                    Object val = whereValues[i];
+                    ps.setObject(i+1, val);
+                }
             ps.executeUpdate();
         }
     }
