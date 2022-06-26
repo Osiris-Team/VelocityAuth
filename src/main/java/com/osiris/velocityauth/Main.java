@@ -2,9 +2,14 @@ package com.osiris.velocityauth;
 
 import com.google.inject.Inject;
 import com.osiris.dyml.exceptions.*;
+import com.osiris.velocityauth.command.AdminLoginCommand;
+import com.osiris.velocityauth.command.AdminRegisterCommand;
+import com.osiris.velocityauth.command.LoginCommand;
+import com.osiris.velocityauth.command.RegisterCommand;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -112,10 +117,21 @@ public class Main {
                 exception.printStackTrace();
             }
         });
+        server.getEventManager().register(this, DisconnectEvent.class, PostOrder.LAST, e -> {
+            try{
+                RegisteredUser registeredUser = RegisteredUser.get("username=?", e.getPlayer().getUsername()).get(0);
+                registeredUser.isLoggedIn = 0;
+                RegisteredUser.update(registeredUser);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
         logger.info("Listeners registered.");
 
         new AdminRegisterCommand().register();
         new AdminLoginCommand().register();
+        new RegisterCommand().register();
+        new LoginCommand().register();
         logger.info("Commands registered.");
     }
 

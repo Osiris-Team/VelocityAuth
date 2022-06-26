@@ -1,5 +1,7 @@
-package com.osiris.velocityauth;
+package com.osiris.velocityauth.command;
 
+import com.osiris.velocityauth.Command;
+import com.osiris.velocityauth.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
