@@ -3,6 +3,7 @@ Authenticate players on your velocity server.
 
 ## Features
 - SQL database support.
+- Blocks players with the same username from joining and prevents kicking of already connected players (useful in offline mode).
 - Whitelist mode to completely block not registered players from joining.
 
 ## Commands

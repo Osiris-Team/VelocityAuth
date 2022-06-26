@@ -23,4 +23,12 @@ public interface Command extends SimpleCommand {
     default boolean hasPermission(Invocation invocation) {
         return invocation.source().hasPermission(permission());
     }
+
+    /**
+     * Actual execution code in here (independent from velocity api).
+     * @param args arguments.
+     * @return error message, null if no error.
+     * @throws Exception if something went really wrong.
+     */
+    String execute(Object... args) throws Exception;
 }

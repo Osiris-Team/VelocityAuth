@@ -13,16 +13,19 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +40,7 @@ public class Main {
     public final Logger logger;
     public boolean isWhitelistMode = false;
     public final Path dataDirectory;
+    public LimboServer limboServer;
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -47,7 +51,7 @@ public class Main {
     }
 
     @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) throws NotLoadedException, YamlReaderException, YamlWriterException, IOException, IllegalKeyException, DuplicateKeyException, IllegalListException {
+    public void onProxyInitialization(ProxyInitializeEvent event) throws NotLoadedException, YamlReaderException, YamlWriterException, IOException, IllegalKeyException, DuplicateKeyException, IllegalListException, URISyntaxException {
         Config config = new Config();
         if(config.databaseUsername.asString() == null){
             logger.info("Welcome! Looks like this is your first run.");
@@ -83,20 +87,28 @@ public class Main {
 
         server.getEventManager().register(this, PreLoginEvent.class, PostOrder.FIRST, e -> {
             try {
-                if(findPlayerByUsername(e.getUsername()) != null){
-                    // Means that there is already another player online with this username
-                    e.setResult(PreLoginEvent.PreLoginComponentResult.denied(
-                            Component.text("Another player named '"+e.getUsername()+"' is currently connected!")
-                    ));
-                    logger.info("Blocked connection for "+e.getUsername()+". Another player with this username is currently connected.");
-                    return;
-                }
-
                 if(isWhitelistMode && !isRegistered(e.getUsername())){
                     e.setResult(PreLoginEvent.PreLoginComponentResult.denied(
                             Component.text("You must be registered to join this server!")
                     ));
                     logger.info("Blocked connection for "+e.getUsername()+". Player not registered (whitelist-mode).");
+                    return;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+        server.getEventManager().register(this, ServerPreConnectEvent.class, PostOrder.FIRST, e -> {
+            try {
+                // Forward to limbo server for login/registration
+                // This server allows multiple players with the same username online
+                // at the same time and thus is perfect for safe authentication
+                // on offline (as well as online) servers.
+                if(!isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName())){
+                    e.setResult(ServerPreConnectEvent.ServerResult.allowed(Main.INSTANCE.limboServer.registeredServer));
+                    logger.info("Blocked connect to '"+e.getOriginalServer().getServerInfo().getName()
+                            +"' and forwarded "+e.getPlayer().getUsername()+" to '"+
+                            Main.INSTANCE.limboServer.registeredServer.getServerInfo().getName()+"'. Player not logged in.");
                     return;
                 }
             } catch (Exception ex) {
@@ -117,7 +129,8 @@ public class Main {
                     Thread.sleep(1000);
                 }
                 for (int i = maxSeconds; i >= 0; i--) {
-                    if(!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername())) break;
+                    if(!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName()))
+                        break;
                     e.getPlayer().sendActionBar(Component.text(i+" seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
                     if(i == 0){
                         e.getPlayer().disconnect(Component.text("Please login within "+maxSeconds+" seconds after joining the server.",
@@ -131,9 +144,14 @@ public class Main {
         });
         server.getEventManager().register(this, DisconnectEvent.class, PostOrder.LAST, e -> {
             try{
-                RegisteredUser registeredUser = RegisteredUser.get("username=?", e.getPlayer().getUsername()).get(0);
-                registeredUser.isLoggedIn = 0;
-                RegisteredUser.update(registeredUser);
+                long now = System.currentTimeMillis();
+                for (Session session : Session.get("username=?", e.getPlayer().getUsername())) {
+                    session.isLoggedIn = 0;
+                    if(now > session.timestampExpires)
+                        Session.remove(session);
+                    else
+                        Session.update(session);
+                }
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -145,12 +163,25 @@ public class Main {
         new RegisterCommand().register();
         new LoginCommand().register();
         logger.info("Commands registered.");
+
+        limboServer = new LimboServer();
+        limboServer.start();
+        logger.info("Started VelocityAuth limbo server.");
+
+        logger.info("Initialised successfully!");
     }
 
-    private boolean isLoggedIn(String username) throws Exception {
-        List<RegisteredUser> registeredUsers = RegisteredUser.get("username=?", username);
-        if(registeredUsers.isEmpty()) return false;
-        return registeredUsers.get(0).isLoggedIn == 1;
+    private boolean isLoggedIn(String username, String ipAddress) throws Exception {
+        List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
+        if(sessions.isEmpty()) return false;
+        Session session = null;
+        for (Session s : sessions) {
+            if(s.isLoggedIn == 1){
+                session = s;
+                break;
+            }
+        }
+        return session != null;
     }
 
     private Player findPlayerByUsername(String username) {

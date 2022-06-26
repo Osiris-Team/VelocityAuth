@@ -21,12 +21,26 @@ public class Config extends Yaml {
         databaseUrl = this.put("database", "url").setDefValues(Database.url);
         databaseUsername = this.put("database", "username");
         databasePassword = this.put("database", "password");
+
         whitelistMode = this.put("whitelist-mode").setCountTopLineBreaks(1)
                 .setDefValues("false")
                 .setComments("If true, not registered players will be blocked from joining the server (proxy).",
                         "Note that in this case your players will have to register themselves",
                         "over another platform, like a website for example.",
                         "If you proxy is in offline mode people are able to bypass this by naming themselves like registered users.");
+
+        this.put("session").setCountTopLineBreaks(1).setComments("A session is created at successful player login and linked to the players ip.",
+                "Players won't have to re-login every time they join,",
+                        " but only when their ip changes, or the session expires.");
+        this.put("session", "max-hours-valid").setDefValues("720").setComments("The maximum time (hours) a session is valid.",
+                "Default is one month (30 days * 24h = 720h).");
+        this.put("session", "ip-limit").setDefValues("1").setComments("The maximum allowed number of ips for ");
+        // Peter(0) logged in and now playing, session = 0
+        // Peter(1) tries connect (gets blocked because Peter is online)
+        // Peter(0) logs out
+        // Peter(1) tries connect (stuck at login)
+        // Peter(0) tries connect (gets blocked because Peter is online)
+        // Problem: Legit Peter(0) can't join the game because fake Peter is online.
         this.save();
     }
 }

@@ -6,6 +6,7 @@ import com.osiris.velocityauth.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public class LoginCommand implements Command {
     }
 
     @Override
+    public String execute(Object... args) throws Exception {
+        return null;
+    }
+
+    @Override
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
@@ -40,21 +46,11 @@ public class LoginCommand implements Command {
             Player player = (Player) source;
             String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
             try {
-                List<RegisteredUser> registeredUsers = RegisteredUser.get("username=", player.getUsername());
-                if(registeredUsers.isEmpty()){
-                    source.sendMessage(Component.text("Failed! Could not find registered user named '"+player.getUsername()+"' in database."));
-                    return;
-                }
-                if(Objects.equals(registeredUsers.get(0).password, encodedPassword)){
-                    try{
-                        registeredUsers.get(0).isLoggedIn = 1; // true
-                        RegisteredUser.update(registeredUsers.get(0));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        source.sendMessage(Component.text("Failed! Details could not updated in the database."));
-                        return;
-                    }
+                String error = new AdminLoginCommand().execute(player.getUsername(), encodedPassword);
+                if(error == null){
                     source.sendMessage(Component.text("Logged in!"));
+                } else {
+                    source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
                     return;
                 }
             } catch (Exception e) {

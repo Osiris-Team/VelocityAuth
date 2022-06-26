@@ -1,5 +1,4 @@
 package com.osiris.velocityauth;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
@@ -20,6 +19,10 @@ public class Session{
                 s.executeUpdate("ALTER TABLE `Session` MODIFY IF EXISTS ipAddress TEXT NOT NULL");
                 s.executeUpdate("ALTER TABLE `Session` ADD COLUMN IF NOT EXISTS timestampExpires BIGINT NOT NULL");
                 s.executeUpdate("ALTER TABLE `Session` MODIFY IF EXISTS timestampExpires BIGINT NOT NULL");
+                s.executeUpdate("ALTER TABLE `Session` ADD COLUMN IF NOT EXISTS timestampLastLogin BIGINT NOT NULL");
+                s.executeUpdate("ALTER TABLE `Session` MODIFY IF EXISTS timestampLastLogin BIGINT NOT NULL");
+                s.executeUpdate("ALTER TABLE `Session` ADD COLUMN IF NOT EXISTS isLoggedIn TINYINT");
+                s.executeUpdate("ALTER TABLE `Session` MODIFY IF EXISTS isLoggedIn TINYINT");
             }
             try (PreparedStatement ps = con.prepareStatement("SELECT id FROM `Session` ORDER BY id DESC LIMIT 1")) {
                 ResultSet rs = ps.executeQuery();
@@ -34,8 +37,16 @@ public class Session{
      if you plan to add this object to the database in the future, since
      that method fetches and sets/reserves the {@link #id}.
      */
-    public Session (int id, int userId, String ipAddress, long timestampExpires){
-        this.id = id;this.userId = userId;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;
+    public Session (int id, int userId, String ipAddress, long timestampExpires, long timestampLastLogin){
+        this.id = id;this.userId = userId;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;this.timestampLastLogin = timestampLastLogin;
+    }
+    /**
+     Use the static create method instead of this constructor,
+     if you plan to add this object to the database in the future, since
+     that method fetches and sets/reserves the {@link #id}.
+     */
+    public Session (int id, int userId, String ipAddress, long timestampExpires, long timestampLastLogin, byte isLoggedIn){
+        this.id = id;this.userId = userId;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;this.timestampLastLogin = timestampLastLogin;this.isLoggedIn = isLoggedIn;
     }
     /**
      Database field/value. Not null. <br>
@@ -54,12 +65,27 @@ public class Session{
      */
     public long timestampExpires;
     /**
+     Database field/value. Not null. <br>
+     */
+    public long timestampLastLogin;
+    /**
+     Database field/value. <br>
+     */
+    public byte isLoggedIn;
+    /**
      Increments the id and sets it for this object (basically reserves a space in the database).
      @return object with latest id. Should be added to the database next by you.
      */
-    public static Session create( int userId, String ipAddress, long timestampExpires) {
+    public static Session create( int userId, String ipAddress, long timestampExpires, long timestampLastLogin) {
         int id = idCounter.incrementAndGet();
-        Session obj = new Session(id, userId, ipAddress, timestampExpires);
+        Session obj = new Session(id, userId, ipAddress, timestampExpires, timestampLastLogin);
+        return obj;
+    }
+
+    public static Session create( int userId, String ipAddress, long timestampExpires, long timestampLastLogin, byte isLoggedIn) {
+        int id = idCounter.incrementAndGet();
+        Session obj = new Session();
+        obj.id=id; obj.userId=userId; obj.ipAddress=ipAddress; obj.timestampExpires=timestampExpires; obj.timestampLastLogin=timestampLastLogin; obj.isLoggedIn=isLoggedIn;
         return obj;
     }
 
@@ -85,7 +111,7 @@ public class Session{
     public static List<Session> get(String where, Object... whereValues) throws Exception {
         List<Session> list = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT id,userId,ipAddress,timestampExpires" +
+                "SELECT id,userId,ipAddress,timestampExpires,timestampLastLogin,isLoggedIn" +
                         " FROM `Session`" +
                         (where != null ? ("WHERE "+where) : ""))) {
             if(where!=null && whereValues!=null)
@@ -101,6 +127,8 @@ public class Session{
                 obj.userId = rs.getInt(2);
                 obj.ipAddress = rs.getString(3);
                 obj.timestampExpires = rs.getLong(4);
+                obj.timestampLastLogin = rs.getLong(5);
+                obj.isLoggedIn = rs.getByte(6);
             }
         }
         return list;
@@ -113,11 +141,13 @@ public class Session{
      */
     public static void update(Session obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "UPDATE `Session` SET id=?,userId=?,ipAddress=?,timestampExpires=?")) {
+                "UPDATE `Session` SET id=?,userId=?,ipAddress=?,timestampExpires=?,timestampLastLogin=?,isLoggedIn=?")) {
             ps.setInt(1, obj.id);
             ps.setInt(2, obj.userId);
             ps.setString(3, obj.ipAddress);
             ps.setLong(4, obj.timestampExpires);
+            ps.setLong(5, obj.timestampLastLogin);
+            ps.setByte(6, obj.isLoggedIn);
             ps.executeUpdate();
         }
     }
@@ -127,11 +157,13 @@ public class Session{
      */
     public static void add(Session obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO `Session` (id,userId,ipAddress,timestampExpires) VALUES (?,?,?,?)")) {
+                "INSERT INTO `Session` (id,userId,ipAddress,timestampExpires,timestampLastLogin,isLoggedIn) VALUES (?,?,?,?,?,?)")) {
             ps.setInt(1, obj.id);
             ps.setInt(2, obj.userId);
             ps.setString(3, obj.ipAddress);
             ps.setLong(4, obj.timestampExpires);
+            ps.setLong(5, obj.timestampLastLogin);
+            ps.setByte(6, obj.isLoggedIn);
             ps.executeUpdate();
         }
     }
@@ -162,7 +194,6 @@ public class Session{
     }
 
     public Session clone(){
-        return new Session(this.id,this.userId,this.ipAddress,this.timestampExpires);
+        return new Session(this.id,this.userId,this.ipAddress,this.timestampExpires,this.timestampLastLogin,this.isLoggedIn);
     }
 }
-
