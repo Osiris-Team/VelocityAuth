@@ -74,7 +74,14 @@ public class Main {
         isWhitelistMode = config.whitelistMode.asBoolean();
         logger.info("Loaded configuration.");
 
-
+        String driverClassName = "com.mysql.jdbc.Driver";
+        try {
+            Class<?> driverClass = Class.forName(driverClassName);
+            Objects.requireNonNull(driverClass);
+        } catch (ClassNotFoundException e) {
+            System.err.println("Failed to find critical database driver class: "+driverClassName);
+            e.printStackTrace();
+        }
         Database.create();
         logger.info("Database connected.");
 
