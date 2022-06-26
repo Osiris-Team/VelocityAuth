@@ -5,7 +5,6 @@ import com.osiris.velocityauth.Main;
 import com.osiris.velocityauth.RegisteredUser;
 import com.osiris.velocityauth.Session;
 import com.velocitypowered.api.command.CommandSource;
-import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
@@ -18,7 +17,7 @@ public final class AdminLoginCommand implements Command {
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if(args.length != 2){
+        if (args.length != 2) {
             source.sendMessage(Component.text("Failed! Requires 2 arguments: <username> <password>"));
             return;
         }
@@ -27,7 +26,7 @@ public final class AdminLoginCommand implements Command {
         String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
         try {
             String error = execute(username, encodedPassword);
-            if(error == null){
+            if (error == null) {
                 source.sendMessage(Component.text("Login success!"));
             } else {
                 source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
@@ -62,19 +61,19 @@ public final class AdminLoginCommand implements Command {
         String ipAddress = (String) args[2];
 
         List<RegisteredUser> registeredUsers = RegisteredUser.get("username=", username);
-        if(registeredUsers.isEmpty())
-            return "Failed! Could not find registered user named '"+username+"' in database.";
-        if(RegisteredUser.get("username=? AND password=?", username, encodedPassword).isEmpty())
+        if (registeredUsers.isEmpty())
+            return "Failed! Could not find registered user named '" + username + "' in database.";
+        if (RegisteredUser.get("username=? AND password=?", username, encodedPassword).isEmpty())
             return "Failed! Invalid credentials!";
         // Login success
-        try{
+        try {
             long now = System.currentTimeMillis();
             RegisteredUser user = registeredUsers.get(0);
             RegisteredUser.update(user);
             List<Session> sessions = Session.get("username=? AND ipAddress=?", user.username, ipAddress);
-            if(sessions.isEmpty()){
+            if (sessions.isEmpty()) {
                 Session.add(Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1));
-            } else{
+            } else {
                 Session session = sessions.get(0);
                 session.isLoggedIn = 1;
                 Session.update(session);

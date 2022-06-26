@@ -7,10 +7,8 @@ import com.osiris.velocityauth.command.AdminRegisterCommand;
 import com.osiris.velocityauth.command.LoginCommand;
 import com.osiris.velocityauth.command.RegisterCommand;
 import com.velocitypowered.api.event.PostOrder;
-import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
-import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
@@ -19,7 +17,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.server.ServerInfo;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
@@ -38,8 +35,8 @@ public class Main {
 
     public final ProxyServer server;
     public final Logger logger;
-    public boolean isWhitelistMode = false;
     public final Path dataDirectory;
+    public boolean isWhitelistMode = false;
     public LimboServer limboServer;
     public int sessionMaxHours;
 
@@ -54,21 +51,21 @@ public class Main {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws NotLoadedException, YamlReaderException, YamlWriterException, IOException, IllegalKeyException, DuplicateKeyException, IllegalListException, URISyntaxException {
         Config config = new Config();
-        if(config.databaseUsername.asString() == null){
+        if (config.databaseUsername.asString() == null) {
             logger.info("Welcome! Looks like this is your first run.");
             logger.info("This plugin requires access to your SQL database.");
             logger.info("Please enter your SQL database username below and press enter:");
             String username = null;
-            while (username == null || username.trim().isEmpty()){
+            while (username == null || username.trim().isEmpty()) {
                 username = new Scanner(System.in).nextLine();
             }
             config.databaseUsername.setValues(username);
             config.save();
         }
-        if(config.databasePassword.asString() == null){
+        if (config.databasePassword.asString() == null) {
             logger.info("Please enter your SQL database password below and press enter:");
             String password = null;
-            while (password == null || password.trim().isEmpty()){
+            while (password == null || password.trim().isEmpty()) {
                 password = new Scanner(System.in).nextLine();
             }
             config.databasePassword.setValues(password);
@@ -89,11 +86,11 @@ public class Main {
 
         server.getEventManager().register(this, PreLoginEvent.class, PostOrder.FIRST, e -> {
             try {
-                if(isWhitelistMode && !isRegistered(e.getUsername())){
+                if (isWhitelistMode && !isRegistered(e.getUsername())) {
                     e.setResult(PreLoginEvent.PreLoginComponentResult.denied(
                             Component.text("You must be registered to join this server!")
                     ));
-                    logger.info("Blocked connection for "+e.getUsername()+". Player not registered (whitelist-mode).");
+                    logger.info("Blocked connection for " + e.getUsername() + ". Player not registered (whitelist-mode).");
                     return;
                 }
             } catch (Exception ex) {
@@ -106,11 +103,11 @@ public class Main {
                 // This server allows multiple players with the same username online
                 // at the same time and thus is perfect for safe authentication
                 // on offline (as well as online) servers.
-                if(!isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName())){
+                if (!isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName())) {
                     e.setResult(ServerPreConnectEvent.ServerResult.allowed(Main.INSTANCE.limboServer.registeredServer));
-                    logger.info("Blocked connect to '"+e.getOriginalServer().getServerInfo().getName()
-                            +"' and forwarded "+e.getPlayer().getUsername()+" to '"+
-                            Main.INSTANCE.limboServer.registeredServer.getServerInfo().getName()+"'. Player not logged in.");
+                    logger.info("Blocked connect to '" + e.getOriginalServer().getServerInfo().getName()
+                            + "' and forwarded " + e.getPlayer().getUsername() + " to '" +
+                            Main.INSTANCE.limboServer.registeredServer.getServerInfo().getName() + "'. Player not logged in.");
                     return;
                 }
             } catch (Exception ex) {
@@ -118,24 +115,24 @@ public class Main {
             }
         });
         server.getEventManager().register(this, ServerConnectedEvent.class, PostOrder.FIRST, e -> {
-            try{
+            try {
                 int maxSeconds = 60;
                 for (int i = maxSeconds; i >= 0; i--) {
-                    if(!e.getPlayer().isActive() || isRegistered(e.getPlayer().getUsername())) break;
-                    e.getPlayer().sendActionBar(Component.text(i+" seconds remaining to: /register <password> <confirm-password>",
+                    if (!e.getPlayer().isActive() || isRegistered(e.getPlayer().getUsername())) break;
+                    e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /register <password> <confirm-password>",
                             TextColor.color(184, 25, 43)));
-                    if(i == 0){
-                        e.getPlayer().disconnect(Component.text("Please register within "+maxSeconds+" seconds after joining the server.",
+                    if (i == 0) {
+                        e.getPlayer().disconnect(Component.text("Please register within " + maxSeconds + " seconds after joining the server.",
                                 TextColor.color(184, 25, 43)));
                     }
                     Thread.sleep(1000);
                 }
                 for (int i = maxSeconds; i >= 0; i--) {
-                    if(!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName()))
+                    if (!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName()))
                         break;
-                    e.getPlayer().sendActionBar(Component.text(i+" seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
-                    if(i == 0){
-                        e.getPlayer().disconnect(Component.text("Please login within "+maxSeconds+" seconds after joining the server.",
+                    e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
+                    if (i == 0) {
+                        e.getPlayer().disconnect(Component.text("Please login within " + maxSeconds + " seconds after joining the server.",
                                 TextColor.color(184, 25, 43)));
                     }
                     Thread.sleep(1000);
@@ -145,11 +142,11 @@ public class Main {
             }
         });
         server.getEventManager().register(this, DisconnectEvent.class, PostOrder.LAST, e -> {
-            try{
+            try {
                 long now = System.currentTimeMillis();
                 for (Session session : Session.get("username=?", e.getPlayer().getUsername())) {
                     session.isLoggedIn = 0;
-                    if(now > session.timestampExpires)
+                    if (now > session.timestampExpires)
                         Session.remove(session);
                     else
                         Session.update(session);
@@ -175,10 +172,10 @@ public class Main {
 
     private boolean isLoggedIn(String username, String ipAddress) throws Exception {
         List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
-        if(sessions.isEmpty()) return false;
+        if (sessions.isEmpty()) return false;
         Session session = null;
         for (Session s : sessions) {
-            if(s.isLoggedIn == 1){
+            if (s.isLoggedIn == 1) {
                 session = s;
                 break;
             }
@@ -189,7 +186,7 @@ public class Main {
     private Player findPlayerByUsername(String username) {
         Player player = null;
         for (Player p : server.getAllPlayers()) {
-            if(Objects.equals(p.getUsername(), username)){
+            if (Objects.equals(p.getUsername(), username)) {
                 player = p;
                 break;
             }

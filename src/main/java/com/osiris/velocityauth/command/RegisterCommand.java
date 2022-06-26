@@ -2,12 +2,10 @@ package com.osiris.velocityauth.command;
 
 import com.osiris.velocityauth.Command;
 import com.osiris.velocityauth.Main;
-import com.osiris.velocityauth.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import java.util.Objects;
 
@@ -36,21 +34,21 @@ public class RegisterCommand implements Command {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if(args.length != 2){
+        if (args.length != 2) {
             source.sendMessage(Component.text("Failed! Requires 2 arguments: <password> <confirm-password>"));
             return;
         }
         String password = args[0];
         String confirmPassword = args[1];
-        if(Objects.equals(password, confirmPassword)){
+        if (Objects.equals(password, confirmPassword)) {
             source.sendMessage(Component.text("Failed! <password> does not match <confirm-password>"));
             return;
         }
-        if(source instanceof Player){
+        if (source instanceof Player) {
             Player player = (Player) source;
             try {
                 String error = new AdminRegisterCommand().execute(player.getUsername(), password);
-                if(error == null){
+                if (error == null) {
                     source.sendMessage(Component.text("Registration success!"));
                 } else {
                     source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
@@ -58,7 +56,7 @@ public class RegisterCommand implements Command {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                source.sendMessage(Component.text("Failed! "+e.getMessage(), TextColor.color(255, 0, 0)));
+                source.sendMessage(Component.text("Failed! " + e.getMessage(), TextColor.color(255, 0, 0)));
                 return;
             }
         } else

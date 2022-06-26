@@ -16,7 +16,7 @@ public class Config extends Yaml {
     public YamlSection sessionMaxHours;
 
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
-        super(new File(Main.INSTANCE.dataDirectory+"/config.yml"));
+        super(new File(Main.INSTANCE.dataDirectory + "/config.yml"));
         this.load();
         databaseRawUrl = this.put("database", "raw-url").setDefValues(Database.rawUrl);
         databaseUrl = this.put("database", "url").setDefValues(Database.url);
@@ -32,7 +32,7 @@ public class Config extends Yaml {
 
         this.put("session").setCountTopLineBreaks(1).setComments("A session is created at successful player login and linked to the players ip.",
                 "Players won't have to re-login every time they join,",
-                        " but only when their ip changes, or the session expires.");
+                " but only when their ip changes, or the session expires.");
         sessionMaxHours = this.put("session", "max-hours-valid").setDefValues("720").setComments("The maximum time (hours) a session is valid.",
                 "Default is one month (30 days * 24h = 720h).");
         this.save();

@@ -10,13 +10,12 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 
 public class LimboServer {
     public File pluginDir = Main.INSTANCE.dataDirectory.toFile();
-    public File dir = new File(pluginDir+"/limbo-server");
-    public File jar = new File(dir +"/server.jar");
+    public File dir = new File(pluginDir + "/limbo-server");
+    public File jar = new File(dir + "/server.jar");
 
     public int port = 0;
     public File pluginJar = null;
@@ -31,27 +30,27 @@ public class LimboServer {
         Objects.requireNonNull(pluginJar);
 
         // Unpack limbo server stuff from jar
-        if(!dir.exists() || dir.listFiles() == null || dir.listFiles().length == 0){
+        if (!dir.exists() || dir.listFiles() == null || dir.listFiles().length == 0) {
             dir.mkdirs();
-            try(ZipFile zip = new ZipFile(pluginJar);){
+            try (ZipFile zip = new ZipFile(pluginJar)) {
                 zip.extractFile("limbo-server", dir.getAbsolutePath());
             }
         }
 
         // Load and update properties
         properties = new Properties();
-        try(BufferedReader reader = new BufferedReader(new FileReader(dir+"/server.properties"))){
+        try (BufferedReader reader = new BufferedReader(new FileReader(dir + "/server.properties"))) {
             properties.load(reader);
         }
         properties.put("allow-flight", true);
         properties.put("allow-chat", false);
         properties.put("bungeecord", true);
         properties.put("default-gamemode", "spectator");
-        properties.put("forwarding-secrets", new Toml().read(new File(pluginDir.getParentFile().getParentFile()+"/velocity.toml"))
-                        .getString("forwarding-secret"));
+        properties.put("forwarding-secrets", new Toml().read(new File(pluginDir.getParentFile().getParentFile() + "/velocity.toml"))
+                .getString("forwarding-secret"));
         properties.put("velocity-modern", true);
         properties.put("server-port", port);
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(dir+"/server.properties"))){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/server.properties"))) {
             properties.store(writer, null);
         }
 
@@ -63,20 +62,21 @@ public class LimboServer {
                 .command("java", "-jar", jar.getAbsolutePath(), "--nogui")
                 .start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if(process!=null && process.isAlive())
+            if (process != null && process.isAlive())
                 process.destroy();
         }));
 
     }
 
-    private int findFreePort(){
+    private int findFreePort() {
         int start = 30000;
         int end = 65000;
         for (int port = start; port < end; port++) {
             try {
                 new ServerSocket(port).close();
                 return port;
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
         return end;
     }

@@ -2,15 +2,11 @@ package com.osiris.velocityauth.command;
 
 import com.osiris.velocityauth.Command;
 import com.osiris.velocityauth.Main;
-import com.osiris.velocityauth.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-
-import java.util.List;
-import java.util.Objects;
 
 public class LoginCommand implements Command {
     @Override
@@ -37,17 +33,17 @@ public class LoginCommand implements Command {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if(args.length != 1){
+        if (args.length != 1) {
             source.sendMessage(Component.text("Failed! Requires 1 argument: <password>"));
             return;
         }
         String password = args[0];
-        if(source instanceof Player){
+        if (source instanceof Player) {
             Player player = (Player) source;
             String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
             try {
                 String error = new AdminLoginCommand().execute(player.getUsername(), encodedPassword);
-                if(error == null){
+                if (error == null) {
                     source.sendMessage(Component.text("Logged in!"));
                 } else {
                     source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));

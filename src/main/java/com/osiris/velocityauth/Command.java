@@ -3,18 +3,14 @@ package com.osiris.velocityauth;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.SimpleCommand;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 public interface Command extends SimpleCommand {
     String command();
+
     String[] aliases();
+
     String permission();
 
-    default void register(){
+    default void register() {
         CommandManager commandManager = Main.INSTANCE.server.getCommandManager();
         commandManager.register(commandManager.metaBuilder(command()).aliases(aliases()).build(), this);
     }
@@ -26,6 +22,7 @@ public interface Command extends SimpleCommand {
 
     /**
      * Actual execution code in here (independent from velocity api).
+     *
      * @param args arguments.
      * @return error message, null if no error.
      * @throws Exception if something went really wrong.
