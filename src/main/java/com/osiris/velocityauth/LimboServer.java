@@ -9,6 +9,8 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -51,8 +53,21 @@ public class LimboServer {
             throw new FileNotFoundException("File does not exist or failed to find: "+velocityToml);
         String forwardingSecret = new Toml().read(velocityToml)
                 .getString("forwarding-secret");
-        if(forwardingSecret == null || forwardingSecret.trim().isEmpty())
-            throw new NullPointerException("The 'forwarding-secret' cannot be null or empty! Checked config: "+velocityToml);
+        if(forwardingSecret == null || forwardingSecret.trim().isEmpty()){
+            String forwardingSecretFilePath = new Toml().read(velocityToml).getString("forwarding-secret-file");
+            if(forwardingSecretFilePath == null || forwardingSecretFilePath.trim().isEmpty())
+                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: "+velocityToml);
+            File forwadingSecretFile = null;
+            if(forwardingSecretFilePath.startsWith("/") || forwardingSecretFilePath.startsWith("\\"))
+                forwadingSecretFile = new File(System.getProperty("user.dir")+forwardingSecretFilePath);
+            else
+                forwadingSecretFile = new File(System.getProperty("user.dir")+"/"+forwardingSecretFilePath);
+            if(!forwadingSecretFile.exists())
+                throw new FileNotFoundException("Failed to find file containing 'forwarding-secret'. Does not exist: "+forwadingSecretFile);
+            forwardingSecret = new String(Files.readAllBytes(forwadingSecretFile.toPath()), StandardCharsets.UTF_8);
+            if(forwardingSecret.trim().isEmpty())
+                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: "+velocityToml);
+        }
         properties.put("forwarding-secrets", forwardingSecret);
         properties.put("velocity-modern", ""+true);
         properties.put("server-port", ""+port);
