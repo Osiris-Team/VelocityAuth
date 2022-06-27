@@ -72,7 +72,7 @@ public final class AdminLoginCommand implements Command {
             RegisteredUser.update(user);
             List<Session> sessions = Session.get("username=? AND ipAddress=?", user.username, ipAddress);
             if (sessions.isEmpty()) {
-                Session.add(Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1));
+                Session.add(Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1, username));
             } else {
                 Session session = sessions.get(0);
                 session.isLoggedIn = 1;
