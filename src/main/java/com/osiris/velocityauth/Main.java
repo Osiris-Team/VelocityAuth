@@ -2,14 +2,20 @@ package com.osiris.velocityauth;
 
 import com.google.inject.Inject;
 import com.osiris.dyml.exceptions.*;
-import com.osiris.velocityauth.command.AdminLoginCommand;
-import com.osiris.velocityauth.command.AdminRegisterCommand;
-import com.osiris.velocityauth.command.LoginCommand;
-import com.osiris.velocityauth.command.RegisterCommand;
+import com.osiris.velocityauth.commands.AdminLoginCommand;
+import com.osiris.velocityauth.commands.AdminRegisterCommand;
+import com.osiris.velocityauth.commands.LoginCommand;
+import com.osiris.velocityauth.commands.RegisterCommand;
+import com.osiris.velocityauth.database.Database;
+import com.osiris.velocityauth.database.RegisteredUser;
+import com.osiris.velocityauth.database.Session;
+import com.osiris.velocityauth.perms.NoPermissionPlayer;
+import com.osiris.velocityauth.perms.MutablePermissionProvider;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -24,9 +30,9 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 @Plugin(id = "velocityauth", name = "VelocityAuth", version = "0.4",
         url = "https://github.com/Osiris-Team", description = "Auth manager for velocity.", authors = {"Osiris-Team, HasX"})
@@ -39,6 +45,7 @@ public class Main {
     public boolean isWhitelistMode = false;
     public LimboServer limboServer;
     public int sessionMaxHours;
+    public List<NoPermissionPlayer> noPermissionPlayers = new CopyOnWriteArrayList<>();
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -114,6 +121,34 @@ public class Main {
                 ex.printStackTrace();
             }
         });
+        server.getEventManager().register(this, PermissionsSetupEvent.class, PostOrder.FIRST, e -> {
+            // Called once at permissions init.
+            // At this state, the player is not logged in.
+            try{
+                // Make sure that all permission providers mutable
+                MutablePermissionProvider permissionProvider =
+                        new MutablePermissionProvider(permission -> e.getSubject().hasPermission(permission));
+                e.setProvider(permissionProvider);
+
+                // Remove all permissions of the user, if not logged in
+                // and restore them later, when logged in.
+                if(e.getSubject() instanceof Player){
+                    Player player = (Player) e.getSubject();
+                    if (!isLoggedIn(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())){
+                        Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
+                        permissionProvider.hasPermission = NoPermissionPlayer.tempPermissionFunction;
+                        noPermissionPlayers.add(new NoPermissionPlayer(
+                                player,
+                                permissionProvider,
+                                oldPermissionFunction));
+                    }
+                }
+                else
+                    throw new Exception("Not a player: "+e.getSubject());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
         server.getEventManager().register(this, ServerConnectedEvent.class, PostOrder.FIRST, e -> {
             try {
                 int maxSeconds = 60;
@@ -151,6 +186,7 @@ public class Main {
                     else
                         Session.update(session);
                 }
+                noPermissionPlayers.removeIf(perm -> Objects.equals(perm.player.getUniqueId(), e.getPlayer().getUniqueId()));
             } catch (Exception exception) {
                 exception.printStackTrace();
             }

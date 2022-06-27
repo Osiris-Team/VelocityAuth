@@ -7,6 +7,8 @@ Authenticate players on your velocity server.
 - Preconfigured and installed limbo auth-server.
 - Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
 - Prevents join blocking (username spoofing / can only happen in offline mode).
+- Blocks all command execution when not logged in (except the /register and /login commands)
+  , by changing the permissions function of the player.  
 - Whitelist mode to completely block not registered players from joining.
 
 ## Commands

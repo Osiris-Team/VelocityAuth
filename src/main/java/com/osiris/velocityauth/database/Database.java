@@ -1,4 +1,4 @@
-package com.osiris.velocityauth;
+package com.osiris.velocityauth.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

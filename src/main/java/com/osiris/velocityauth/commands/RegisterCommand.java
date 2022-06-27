@@ -1,6 +1,5 @@
-package com.osiris.velocityauth.command;
+package com.osiris.velocityauth.commands;
 
-import com.osiris.velocityauth.Command;
 import com.osiris.velocityauth.Main;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;

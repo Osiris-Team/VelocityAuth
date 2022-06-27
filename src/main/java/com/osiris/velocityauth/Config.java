@@ -3,6 +3,7 @@ package com.osiris.velocityauth;
 import com.osiris.dyml.Yaml;
 import com.osiris.dyml.YamlSection;
 import com.osiris.dyml.exceptions.*;
+import com.osiris.velocityauth.database.Database;
 
 import java.io.File;
 import java.io.IOException;

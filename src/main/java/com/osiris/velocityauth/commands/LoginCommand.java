@@ -1,12 +1,14 @@
-package com.osiris.velocityauth.command;
+package com.osiris.velocityauth.commands;
 
-import com.osiris.velocityauth.Command;
+import com.osiris.velocityauth.perms.NoPermissionPlayer;
 import com.osiris.velocityauth.Main;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+
+import java.util.Objects;
 
 public class LoginCommand implements Command {
     @Override
@@ -51,8 +53,21 @@ public class LoginCommand implements Command {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                source.sendMessage(Component.text("Failed! Details could not be added to the database."));
+                source.sendMessage(Component.text("Failed! Details could not be added to the database.", TextColor.color(255, 0, 0)));
                 return;
+            }
+
+            // Restore default permission function
+            try{
+                for (NoPermissionPlayer perm : Main.INSTANCE.noPermissionPlayers) {
+                    if(Objects.equals(perm.player.getUniqueId(), player.getUniqueId())){
+                        perm.permissionProvider.hasPermission = perm.oldPermissionFunction;
+                        Main.INSTANCE.noPermissionPlayers.remove(perm);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                source.sendMessage(Component.text("Failed! "+e.getMessage(), TextColor.color(255, 0, 0)));
             }
         } else
             Main.INSTANCE.logger.error("Failed! Must be player to execute this command.");

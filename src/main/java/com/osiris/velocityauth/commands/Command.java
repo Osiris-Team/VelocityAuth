@@ -1,5 +1,6 @@
-package com.osiris.velocityauth;
+package com.osiris.velocityauth.commands;
 
+import com.osiris.velocityauth.Main;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.SimpleCommand;
 
