@@ -207,7 +207,7 @@ public class Main {
         logger.info("Initialised successfully!");
     }
 
-    private boolean isLoggedIn(String username, String ipAddress) throws Exception {
+    public boolean isLoggedIn(String username, String ipAddress) throws Exception {
         List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
         if (sessions.isEmpty()) return false;
         Session session = null;
@@ -220,7 +220,7 @@ public class Main {
         return session != null;
     }
 
-    private Player findPlayerByUsername(String username) {
+    public Player findPlayerByUsername(String username) {
         Player player = null;
         for (Player p : server.getAllPlayers()) {
             if (Objects.equals(p.getUsername(), username)) {

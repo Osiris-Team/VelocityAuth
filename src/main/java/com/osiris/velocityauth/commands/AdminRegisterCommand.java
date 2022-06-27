@@ -1,5 +1,6 @@
 package com.osiris.velocityauth.commands;
 
+import com.osiris.velocityauth.Main;
 import com.osiris.velocityauth.database.RegisteredUser;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
@@ -49,6 +50,8 @@ public final class AdminRegisterCommand implements Command {
     public String execute(Object... args) throws Exception {
         String username = (String) args[0];
         String password = (String) args[1];
+        if(Main.INSTANCE.isRegistered(username))
+            return "Failed! Already registered!";
         String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
         try {
             RegisteredUser.add(
