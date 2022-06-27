@@ -12,7 +12,7 @@ Authenticate players on your velocity server.
 - Whitelist mode to completely block not registered players from joining.
 
 ## Usage
-1. Download `Velocity-Auth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
+1. Download `VelocityAuth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
 2. Put the jar into your velocity /plugins folder.
 3. Start your velocity server/proxy.
 
