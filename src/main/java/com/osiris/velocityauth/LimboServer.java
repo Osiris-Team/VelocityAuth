@@ -9,6 +9,10 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Objects;
@@ -34,9 +38,17 @@ public class LimboServer {
 
         // Unpack limbo server stuff from jar
         if (!dir.exists() || dir.listFiles() == null || dir.listFiles().length == 0) {
-
             try (ZipFile zip = new ZipFile(pluginJar)) {
                 zip.extractFile("limbo-server/", pluginDir.getAbsolutePath()); // plugindir/limbo-server
+            }
+            // Download limbo server jar
+            try(ReadableByteChannel readableByteChannel = Channels.newChannel(new URL("" +
+                    "https://ci.loohpjames.com/job/Limbo/lastSuccessfulBuild/artifact/target/Limbo-0.6.16-ALPHA-1.19.jar")
+                    .openStream());){
+                if(!jar.exists()) jar.createNewFile();
+                try(FileChannel c = new FileOutputStream(jar).getChannel();){
+                    c.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+                }
             }
         }
 
@@ -81,7 +93,7 @@ public class LimboServer {
 
         process = new ProcessBuilder()
                 .directory(dir)
-                .command("java", "-jar", jar.getAbsolutePath(), "--nogui")
+                .command("java","-Dorg.jline.terminal.dumb=true", "-jar", jar.getAbsolutePath(), "--nogui")
                 .start();
 
         if(errorReaderThread != null) errorReaderThread.interrupt();

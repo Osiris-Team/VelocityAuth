@@ -8,7 +8,3 @@ groups:
     - limboserver.spawn
     - limboserver.chat
     - limboserver.version
-
-players:
-  LOOHP: 
-    - admin
