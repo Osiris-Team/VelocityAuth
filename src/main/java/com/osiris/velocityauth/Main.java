@@ -122,17 +122,19 @@ public class Main {
             }
         });
         server.getEventManager().register(this, PermissionsSetupEvent.class, PostOrder.FIRST, e -> {
-            // Called once at permissions init.
+            // Called once at permissions init for anything that can have permissions
+            // like the VelocityConsole or the Player object.
             // At this state, the player is not logged in.
             try{
-                // Make sure that all permission providers mutable
-                MutablePermissionProvider permissionProvider =
-                        new MutablePermissionProvider(permission -> e.getSubject().hasPermission(permission));
-                e.setProvider(permissionProvider);
-
                 // Remove all permissions of the user, if not logged in
                 // and restore them later, when logged in.
                 if(e.getSubject() instanceof Player){
+
+                    // Make sure that all permission providers for players are mutable
+                    MutablePermissionProvider permissionProvider =
+                            new MutablePermissionProvider(permission -> e.getSubject().hasPermission(permission));
+                    e.setProvider(permissionProvider);
+
                     Player player = (Player) e.getSubject();
                     if (!isLoggedIn(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())){
                         Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
