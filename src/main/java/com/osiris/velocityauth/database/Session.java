@@ -1,4 +1,5 @@
 package com.osiris.velocityauth.database;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
@@ -11,8 +12,6 @@ public class Session{
             con = java.sql.DriverManager.getConnection(Database.url, Database.username, Database.password);
             try (Statement s = con.createStatement()) {
                 s.executeUpdate("CREATE TABLE IF NOT EXISTS `Session` (id INT NOT NULL PRIMARY KEY)");
-                try{s.executeUpdate("ALTER TABLE `Session` ADD COLUMN id INT NOT NULL PRIMARY KEY");}catch(Exception ignored){}
-                s.executeUpdate("ALTER TABLE `Session` MODIFY COLUMN id INT NOT NULL PRIMARY KEY");
                 try{s.executeUpdate("ALTER TABLE `Session` ADD COLUMN userId INT NOT NULL");}catch(Exception ignored){}
                 s.executeUpdate("ALTER TABLE `Session` MODIFY COLUMN userId INT NOT NULL");
                 try{s.executeUpdate("ALTER TABLE `Session` ADD COLUMN ipAddress TEXT NOT NULL");}catch(Exception ignored){}
