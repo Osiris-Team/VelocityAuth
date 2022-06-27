@@ -143,8 +143,7 @@ public class Main {
                                 oldPermissionFunction));
                     }
                 }
-                else
-                    throw new Exception("Not a player: "+e.getSubject());
+                // else do nothing, since only relevant for players
             } catch (Exception exception) {
                 exception.printStackTrace();
             }

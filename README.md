@@ -4,7 +4,7 @@ Authenticate players on your velocity server.
 ## Features
 - SQL database support.
 - Session based authentication.
-- Preconfigured and installed limbo auth-server.
+- Pre-configured, auto-installed and auto-started limbo auth-server.
 - Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
 - Blocks all command execution for not logged in players (except the /register and /login commands)
   , by changing the permissions function of the player.  

@@ -31,7 +31,7 @@ public class LimboServer {
 
         // Unpack limbo server stuff from jar
         if (!dir.exists() || dir.listFiles() == null || dir.listFiles().length == 0) {
-            dir.mkdirs();
+
             try (ZipFile zip = new ZipFile(pluginJar)) {
                 zip.extractFile("limbo-server/", pluginDir.getAbsolutePath()); // plugindir/limbo-server
             }
@@ -46,8 +46,14 @@ public class LimboServer {
         properties.put("allow-chat", ""+false);
         properties.put("bungeecord", ""+true);
         properties.put("default-gamemode", "spectator");
-        properties.put("forwarding-secrets", new Toml().read(new File(pluginJar.getParentFile().getParentFile() + "/velocity.toml"))
-                .getString("forwarding-secret"));
+        File velocityToml = new File(pluginJar.getParentFile().getParentFile() + "/velocity.toml");
+        if (!velocityToml.exists())
+            throw new FileNotFoundException("File does not exist or failed to find: "+velocityToml);
+        String forwardingSecret = new Toml().read(velocityToml)
+                .getString("forwarding-secret");
+        if(forwardingSecret == null || forwardingSecret.trim().isEmpty())
+            throw new NullPointerException("The 'forwarding-secret' cannot be null or empty! Checked config: "+velocityToml);
+        properties.put("forwarding-secrets", forwardingSecret);
         properties.put("velocity-modern", ""+true);
         properties.put("server-port", ""+port);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/server.properties"))) {
