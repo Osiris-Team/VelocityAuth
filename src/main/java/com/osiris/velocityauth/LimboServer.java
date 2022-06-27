@@ -59,9 +59,9 @@ public class LimboServer {
                 throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: "+velocityToml);
             File forwadingSecretFile = null;
             if(forwardingSecretFilePath.startsWith("/") || forwardingSecretFilePath.startsWith("\\"))
-                forwadingSecretFile = new File(System.getProperty("user.dir")+forwardingSecretFilePath);
+                forwadingSecretFile = new File(velocityToml.getParentFile()+forwardingSecretFilePath);
             else
-                forwadingSecretFile = new File(System.getProperty("user.dir")+"/"+forwardingSecretFilePath);
+                forwadingSecretFile = new File(velocityToml.getParentFile()+"/"+forwardingSecretFilePath);
             if(!forwadingSecretFile.exists())
                 throw new FileNotFoundException("Failed to find file containing 'forwarding-secret'. Does not exist: "+forwadingSecretFile);
             forwardingSecret = new String(Files.readAllBytes(forwadingSecretFile.toPath()), StandardCharsets.UTF_8);
