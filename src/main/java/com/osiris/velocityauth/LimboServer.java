@@ -24,6 +24,7 @@ public class LimboServer {
     public Properties properties;
     public Process process;
     public RegisteredServer registeredServer;
+    public Thread errorReaderThread;
 
     public void start() throws IOException, URISyntaxException {
         port = findFreePort();
@@ -82,6 +83,19 @@ public class LimboServer {
                 .directory(dir)
                 .command("java", "-jar", jar.getAbsolutePath(), "--nogui")
                 .start();
+
+        if(errorReaderThread != null) errorReaderThread.interrupt();
+        errorReaderThread = new Thread(() -> {
+           try(BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))){
+               String line = null;
+               while ((line = reader.readLine()) != null){
+                   System.err.println("(error-limbo) "+line);
+               }
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+        });
+        errorReaderThread.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (process != null && process.isAlive())
                 process.destroy();
