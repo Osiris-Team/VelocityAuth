@@ -4,6 +4,7 @@ import com.osiris.velocityauth.perms.NoPermissionPlayer;
 import com.osiris.velocityauth.Main;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
@@ -68,6 +69,12 @@ public class LoginCommand implements Command {
             } catch (Exception e) {
                 e.printStackTrace();
                 source.sendMessage(Component.text("Failed! "+e.getMessage(), TextColor.color(255, 0, 0)));
+            }
+
+            // Forward user to first server
+            for (RegisteredServer s : Main.INSTANCE.server.getAllServers()) {
+                player.createConnectionRequest(s).fireAndForget();
+                break;
             }
         } else
             Main.INSTANCE.logger.error("Failed! Must be player to execute this command.");
