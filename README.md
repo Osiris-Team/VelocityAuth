@@ -20,11 +20,11 @@ Authenticate players on your velocity server.
 ## Commands
 
 #### /aregister _username_ _password_
-- Registers the provided player.
+- Registers the provided player. (Should only be used by admins.)
 - Permission: `velocityauth.admin.register`
 
 #### /alogin _username_ _password_
-- Logins the provided player.
+- Logins the provided player. (Should only be used by admins.)
 - Permission: `velocityauth.admin.login`
 
 #### /register _password_ _confirm-password_
