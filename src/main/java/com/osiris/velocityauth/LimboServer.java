@@ -112,7 +112,6 @@ public class LimboServer {
             if (process != null && process.isAlive())
                 process.destroy();
         }));
-
     }
 
     private int findFreePort() {

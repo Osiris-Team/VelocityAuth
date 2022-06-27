@@ -23,6 +23,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public class Main {
     public LimboServer limboServer;
     public int sessionMaxHours;
     public List<NoPermissionPlayer> noPermissionPlayers = new CopyOnWriteArrayList<>();
+    public RegisteredServer authServer;
 
     @Inject
     public Main(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
@@ -87,6 +89,18 @@ public class Main {
         sessionMaxHours = config.sessionMaxHours.asInt();
         logger.info("Loaded configuration.");
 
+        if(config.debugAuthServerName.asString() != null){
+            authServer = server.getServer(config.debugAuthServerName.asString()).get();
+            logger.info("Using alternative/custom auth-server ("+authServer.getServerInfo().getAddress().toString()+
+                    ").");
+        } else {
+            limboServer = new LimboServer();
+            limboServer.start();
+            authServer = limboServer.registeredServer;
+            logger.info("Started limbo auth-server (localhost:"+limboServer.port+"/running:"+limboServer.process.isAlive()+").");
+        }
+
+
         Database.create();
         logger.info("Database connected.");
 
@@ -111,10 +125,10 @@ public class Main {
                 // at the same time and thus is perfect for safe authentication
                 // on offline (as well as online) servers.
                 if (!isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName())) {
-                    e.setResult(ServerPreConnectEvent.ServerResult.allowed(Main.INSTANCE.limboServer.registeredServer));
+                    e.setResult(ServerPreConnectEvent.ServerResult.allowed(authServer));
                     logger.info("Blocked connect to '" + e.getOriginalServer().getServerInfo().getName()
                             + "' and forwarded " + e.getPlayer().getUsername() + " to '" +
-                            Main.INSTANCE.limboServer.registeredServer.getServerInfo().getName() + "'. Player not logged in.");
+                            authServer.getServerInfo().getName() + "'. Player not logged in.");
                     return;
                 }
             } catch (Exception ex) {
@@ -199,10 +213,6 @@ public class Main {
         new RegisterCommand().register();
         new LoginCommand().register();
         logger.info("Commands registered.");
-
-        limboServer = new LimboServer();
-        limboServer.start();
-        logger.info("Started limbo auth-server (localhost:"+limboServer.port+"/running:"+limboServer.process.isAlive()+").");
 
         logger.info("Initialised successfully!");
     }
