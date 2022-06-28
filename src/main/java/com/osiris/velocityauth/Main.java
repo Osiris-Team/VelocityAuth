@@ -208,10 +208,6 @@ public class Main {
                         Thread.sleep(1000);
                     }
                     for (int i = maxSeconds; i >= 0; i--) {
-                        System.err.println(Instant.now().toString());
-                        for (Session session : Session.get()) {
-                            System.err.println(session.toPrintString());
-                        }
                         if (!e.getPlayer().isActive() || hasValidSession(e.getPlayer()))
                             break;
                         e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
