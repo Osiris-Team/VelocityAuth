@@ -149,8 +149,7 @@ public class Main {
                 // This server allows multiple players with the same username online
                 // at the same time and thus is perfect for safe authentication
                 // on offline (as well as online) servers.
-                if (getValidSession(e.getPlayer().getUsername(),
-                        e.getPlayer().getRemoteAddress().getAddress().getHostName()) == null) {
+                if (!hasValidSession(e.getPlayer())) {
                     e.setResult(ServerPreConnectEvent.ServerResult.allowed(authServer));
                     logger.info("Blocked connect to '" + e.getOriginalServer().getServerInfo().getName()
                             + "' and forwarded " + e.getPlayer().getUsername() + " to '" +
@@ -176,7 +175,7 @@ public class Main {
                     e.setProvider(permissionProvider);
 
                     Player player = (Player) e.getSubject();
-                    if (getValidSession(player) == null) {
+                    if (!hasValidSession(player)) {
                         Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
                         permissionProvider.hasPermission = NoPermissionPlayer.tempPermissionFunction;
                         noPermissionPlayers.add(new NoPermissionPlayer(
@@ -205,7 +204,7 @@ public class Main {
                         Thread.sleep(1000);
                     }
                     for (int i = maxSeconds; i >= 0; i--) {
-                        if (!e.getPlayer().isActive() || getValidSession(e.getPlayer()) != null)
+                        if (!e.getPlayer().isActive() || hasValidSession(e.getPlayer()))
                             break;
                         e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
                         if (i == 0) {
@@ -257,11 +256,17 @@ public class Main {
         logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");
     }
 
+    public boolean hasValidSession(Player player) throws Exception {
+        return getValidSession(player) != null;
+    }
     public Session getValidSession(Player player) throws Exception {
         return getValidSession(player.getUsername(),
                 player.getRemoteAddress().getAddress().getHostName());
     }
 
+    public boolean hasValidSession(String username, String ipAddress) throws Exception {
+        return getValidSession(username, ipAddress) != null;
+    }
     /**
      * Returns true, if this username/ip-address has no session, aka
      * the player never logged in, or another older session expired.
