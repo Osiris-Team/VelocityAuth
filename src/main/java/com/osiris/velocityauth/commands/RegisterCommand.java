@@ -34,13 +34,15 @@ public class RegisterCommand implements Command {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
         if (args.length != 2) {
-            source.sendMessage(Component.text("Failed! Requires 2 arguments: <password> <confirm-password>"));
+            source.sendMessage(Component.text("Failed! Requires 2 arguments: <password> <confirm-password>",
+                    TextColor.color(255, 0, 0)));
             return;
         }
         String password = args[0];
         String confirmPassword = args[1];
-        if (Objects.equals(password, confirmPassword)) {
-            source.sendMessage(Component.text("Failed! <password> does not match <confirm-password>"));
+        if (!Objects.equals(password, confirmPassword)) {
+            source.sendMessage(Component.text("Failed! <password> does not match <confirm-password>",
+                    TextColor.color(255, 0, 0)));
             return;
         }
         if (source instanceof Player) {

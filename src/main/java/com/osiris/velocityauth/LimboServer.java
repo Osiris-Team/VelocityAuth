@@ -88,7 +88,7 @@ public class LimboServer {
             properties.store(writer, null);
         }
 
-        registeredServer = Main.INSTANCE.server.registerServer(
+        registeredServer = Main.INSTANCE.proxy.registerServer(
                 new ServerInfo("velocity_auth_limbo", new InetSocketAddress("127.0.0.1", port)));
 
         process = new ProcessBuilder()

@@ -40,8 +40,9 @@ public class Config extends Yaml {
 
         this.put("debug").setCountTopLineBreaks(1).setComments("Options useful for debugging stuff.",
                 "Could disappear in future releases without notice.",
-                "Changing of this values not advised.");
-        debugAuthServerName = this.put("debug", "auth-server-name");
+                "Changing any of this values not advised.");
+        debugAuthServerName = this.put("debug", "auth-server-name").setComments("When null, default pre-installed limbo server will",
+        "be started and used. Otherwise the provided server will be used as auth-server.");
         this.save();
     }
 }

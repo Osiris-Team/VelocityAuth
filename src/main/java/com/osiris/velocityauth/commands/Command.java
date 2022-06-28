@@ -12,7 +12,7 @@ public interface Command extends SimpleCommand {
     String permission();
 
     default void register() {
-        CommandManager commandManager = Main.INSTANCE.server.getCommandManager();
+        CommandManager commandManager = Main.INSTANCE.proxy.getCommandManager();
         commandManager.register(commandManager.metaBuilder(command()).aliases(aliases()).build(), this);
     }
 

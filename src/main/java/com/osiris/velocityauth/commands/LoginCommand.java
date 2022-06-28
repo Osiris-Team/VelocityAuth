@@ -43,9 +43,9 @@ public class LoginCommand implements Command {
         String password = args[0];
         if (source instanceof Player) {
             Player player = (Player) source;
-            String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
             try {
-                String error = new AdminLoginCommand().execute(player.getUsername(), encodedPassword);
+                String error = new AdminLoginCommand().execute(player.getUsername(), password,
+                        player.getRemoteAddress().getAddress().getHostAddress());
                 if (error == null) {
                     source.sendMessage(Component.text("Logged in!"));
                 } else {
@@ -72,7 +72,7 @@ public class LoginCommand implements Command {
             }
 
             // Forward user to first server
-            for (RegisteredServer s : Main.INSTANCE.server.getAllServers()) {
+            for (RegisteredServer s : Main.INSTANCE.proxy.getAllServers()) {
                 player.createConnectionRequest(s).fireAndForget();
                 break;
             }

@@ -16,15 +16,15 @@ public final class AdminLoginCommand implements Command {
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        if (args.length != 2) {
-            source.sendMessage(Component.text("Failed! Requires 2 arguments: <username> <password>"));
+        if (args.length != 3) {
+            source.sendMessage(Component.text("Failed! Requires 3 arguments: <username> <password> <ip-address>"));
             return;
         }
         String username = args[0];
         String password = args[1];
-        String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
+        String ipAddress = args[2];
         try {
-            String error = execute(username, encodedPassword);
+            String error = execute(username, password, ipAddress);
             if (error == null) {
                 source.sendMessage(Component.text("Login success!"));
             } else {
@@ -40,7 +40,7 @@ public final class AdminLoginCommand implements Command {
 
     @Override
     public String command() {
-        return "alogin";
+        return "a_login";
     }
 
     @Override
@@ -55,15 +55,19 @@ public final class AdminLoginCommand implements Command {
 
     @Override
     public String execute(Object... args) throws Exception {
-        String username = (String) args[0];
-        String encodedPassword = (String) args[1];
-        String ipAddress = (String) args[2];
+        if(args.length != 3) return "Failed! Required 3 arguments: <username> <password> <ip-address>";
+        String username = ((String) args[0]).trim();
+        String password = ((String) args[1]).trim();
+        String ipAddress = ((String) args[2]).trim();
         if (Main.INSTANCE.isLoggedIn(username, ipAddress))
             return "Failed! Already logged in!";
-        List<RegisteredUser> registeredUsers = RegisteredUser.get("username=", username);
+        List<RegisteredUser> registeredUsers = RegisteredUser.get("username=?", username);
         if (registeredUsers.isEmpty())
             return "Failed! Could not find registered user named '" + username + "' in database.";
-        if (RegisteredUser.get("username=? AND password=?", username, encodedPassword).isEmpty())
+        if(registeredUsers.size() > 1)
+            throw new Exception("There are multiple ("+registeredUsers.size()+") registered players named '"+username
+                    +"'! Its highly recommended to fix this issue.");
+        if (!new Pbkdf2PasswordEncoder().matches(password, registeredUsers.get(0).password))
             return "Failed! Invalid credentials!";
         // Login success
         try {
@@ -71,13 +75,16 @@ public final class AdminLoginCommand implements Command {
             RegisteredUser user = registeredUsers.get(0);
             RegisteredUser.update(user);
             List<Session> sessions = Session.get("username=? AND ipAddress=?", user.username, ipAddress);
+            Session session = null;
             if (sessions.isEmpty()) {
-                Session.add(Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1, username));
+                session = Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1, username);
+                Session.add(session);
             } else {
-                Session session = sessions.get(0);
+                session = sessions.get(0);
                 session.isLoggedIn = 1;
                 Session.update(session);
             }
+            Main.INSTANCE.logger.info("Login success for '"+username+"', using session "+session.id);
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed! Database details could not updated.";
