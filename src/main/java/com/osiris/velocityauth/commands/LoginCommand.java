@@ -36,7 +36,7 @@ public class LoginCommand implements Command {
     public void execute(Invocation invocation) {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
-        Main.INSTANCE.proxy.getScheduler().buildTask(Main.INSTANCE, () -> {
+        Main.INSTANCE.executor.execute(() -> {
             if (source instanceof Player) {
                 Player player = (Player) source;
                 try {
@@ -92,7 +92,7 @@ public class LoginCommand implements Command {
                 }
             } else
                 Main.INSTANCE.logger.error("Failed! Must be player to execute this command.");
-        }).schedule();
+        });
     }
 
     private void sendFailedLogin(Player player, String reason) {

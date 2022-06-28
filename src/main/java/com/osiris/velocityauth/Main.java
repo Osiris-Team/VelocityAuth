@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Predicate;
 
 @Plugin(id = "velocityauth", name = "VelocityAuth", version = "0.4",
@@ -53,6 +55,7 @@ public class Main {
     public RegisteredServer authServer;
     public int minFailedLoginsForBan;
     public int failedLoginBanTimeSeconds;
+    public ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     @Inject
     public Main(ProxyServer proxy, Logger logger, @DataDirectory Path dataDirectory) {
@@ -191,7 +194,7 @@ public class Main {
             }
         });
         proxy.getEventManager().register(this, ServerConnectedEvent.class, PostOrder.FIRST, e -> {
-            proxy.getScheduler().buildTask(this, () -> {
+            executor.execute(() -> {
                 try {
                     int maxSeconds = 60;
                     for (int i = maxSeconds; i >= 0; i--) {
@@ -228,7 +231,7 @@ public class Main {
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
-            }).schedule();
+            });
         });
         proxy.getEventManager().register(this, DisconnectEvent.class, PostOrder.LAST, e -> {
             try {
