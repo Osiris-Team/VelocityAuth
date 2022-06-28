@@ -1,25 +1,29 @@
 # VelocityAuth
-Authenticate players on your velocity server.
+Authenticate players on your velocity proxy (1.19 support)
 
 ## Features
-- SQL database support.
-- Session based authentication (players only need to login once).
-- Pre-configured, auto-installed and auto-started limbo auth-server.
-- Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
-- Blocks all proxy command execution for not logged in players (except the /register and /login commands)
+- Basics
+  - SQL database support.
+  - Session based authentication (players only need to login once).
+  - Pre-configured, auto-installed and auto-started limbo auth-server.
+  - Whitelist mode to completely block not registered players from joining.
+- Security
+  - Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
+  - Blocks all proxy command execution for not logged in players (except the /register and /login commands)
   , by changing the permissions function of the player.  
-- Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
-- Prevents join blocking (username spoofing / can only happen in offline mode).
-- Whitelist mode to completely block not registered players from joining.
+  - Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
+  - Prevents join blocking (username spoofing / can only happen in offline mode).
+  - Secured against password timing attacks.
+  - Secured against password spamming attacks, by temp-banning those players (configurable).
+  - Secured against SQL injection.
+
 
 ## Usage
 1. Download `VelocityAuth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
 2. Put the jar into your velocity /plugins folder.
 3. Start your velocity server/proxy.
 
-## Commands
-
-### Player commands
+## Player commands
 
 #### /register _password_ _confirm-password_
 - Registers the player.
@@ -30,7 +34,7 @@ Authenticate players on your velocity server.
   so this player can rejoin without needing to login again.
 - Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
 
-### Admin commands
+## Admin commands
 
 #### /a_register _username_ _password_
 - Registers the provided player.
@@ -52,4 +56,4 @@ Authenticate players on your velocity server.
 #### /clear_sessions _(username)_
 - Removes/Clears all sessions from the database.
 - Removes/Clears all sessions from the database for the specified player, if username provided.
-- Permission: `velocityauth.list.sessions`
+- Permission: `velocityauth.clear.sessions`
