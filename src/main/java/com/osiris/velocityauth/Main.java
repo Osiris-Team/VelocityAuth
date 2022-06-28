@@ -149,7 +149,8 @@ public class Main {
                 // This server allows multiple players with the same username online
                 // at the same time and thus is perfect for safe authentication
                 // on offline (as well as online) servers.
-                if (!isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName())) {
+                if (getValidSession(e.getPlayer().getUsername(),
+                        e.getPlayer().getRemoteAddress().getAddress().getHostName()) == null) {
                     e.setResult(ServerPreConnectEvent.ServerResult.allowed(authServer));
                     logger.info("Blocked connect to '" + e.getOriginalServer().getServerInfo().getName()
                             + "' and forwarded " + e.getPlayer().getUsername() + " to '" +
@@ -175,7 +176,8 @@ public class Main {
                     e.setProvider(permissionProvider);
 
                     Player player = (Player) e.getSubject();
-                    if (!isLoggedIn(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())) {
+                    if (getValidSession(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())
+                    == null) {
                         Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
                         permissionProvider.hasPermission = NoPermissionPlayer.tempPermissionFunction;
                         noPermissionPlayers.add(new NoPermissionPlayer(
@@ -204,7 +206,8 @@ public class Main {
                         Thread.sleep(1000);
                     }
                     for (int i = maxSeconds; i >= 0; i--) {
-                        if (!e.getPlayer().isActive() || isLoggedIn(e.getPlayer().getUsername(), e.getPlayer().getRemoteAddress().getAddress().getHostName()))
+                        if (!e.getPlayer().isActive() || getValidSession(e.getPlayer().getUsername(),
+                                e.getPlayer().getRemoteAddress().getAddress().getHostName()) != null)
                             break;
                         e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
                         if (i == 0) {
@@ -212,6 +215,13 @@ public class Main {
                                     TextColor.color(184, 25, 43)));
                         }
                         Thread.sleep(1000);
+                    }
+
+                    Session session = getValidSession(e.getPlayer().getUsername(),
+                            e.getPlayer().getRemoteAddress().getAddress().getHostName());
+                    if(session != null){
+                        session.isActive = 1;
+                        Session.update(session);
                     }
                 } catch (InterruptedException ignored) {
                 } catch (Exception exception) {
@@ -223,7 +233,7 @@ public class Main {
             try {
                 long now2 = System.currentTimeMillis();
                 for (Session session : Session.get("username=?", e.getPlayer().getUsername())) {
-                    session.isLoggedIn = 0;
+                    session.isActive = 0;
                     if (now2 > session.timestampExpires)
                         Session.remove(session);
                     else
@@ -244,22 +254,22 @@ public class Main {
         new LoginCommand().register();
         new BanCommand().register();
         new ListSessionsCommand().register();
+        new ClearSessionsCommand().register();
         logger.info("Commands registered. " + (System.currentTimeMillis() - now) + "ms");
 
         logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");
     }
 
-    public boolean isLoggedIn(String username, String ipAddress) throws Exception {
+    /**
+     * Returns true, if this username/ip-address has no session, aka
+     * the player never logged in, or another older session expired.
+     */
+    public Session getValidSession(String username, String ipAddress) throws Exception {
         List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
-        if (sessions.isEmpty()) return false;
-        Session session = null;
-        for (Session s : sessions) {
-            if (s.isLoggedIn == 1) {
-                session = s;
-                break;
-            }
-        }
-        return session != null;
+        if (sessions.isEmpty()) return null;
+        if(sessions.size() > 1) throw new RuntimeException("Cannot have multiple("+sessions.size()
+                +") sessions for one username("+username+")/ip-address("+ipAddress+").");
+        return sessions.get(0);
     }
 
     public Player findPlayerByUsername(String username) {

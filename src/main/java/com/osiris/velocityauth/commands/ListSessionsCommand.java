@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ListSessionsCommand implements Command {
     @Override
     public String command() {
-        return "list sessions";
+        return "list_sessions";
     }
 
     @Override

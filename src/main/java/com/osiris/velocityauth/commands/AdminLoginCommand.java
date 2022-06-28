@@ -60,7 +60,7 @@ public final class AdminLoginCommand implements Command {
         String username = ((String) args[0]).trim();
         String password = ((String) args[1]).trim();
         String ipAddress = ((String) args[2]).trim();
-        if (Main.INSTANCE.isLoggedIn(username, ipAddress))
+        if (Main.INSTANCE.getValidSession(username, ipAddress) != null)
             return "Failed! Already logged in!";
         List<RegisteredUser> registeredUsers = RegisteredUser.get("username=?", username);
         if (registeredUsers.isEmpty())
@@ -79,11 +79,12 @@ public final class AdminLoginCommand implements Command {
             List<Session> sessions = Session.get("username=? AND ipAddress=?", user.username, ipAddress);
             Session session = null;
             if (sessions.isEmpty()) {
-                session = Session.create(user.id, ipAddress, now + Main.INSTANCE.sessionMaxHours, (byte) 1, username);
+                session = Session.create(user.id, ipAddress,
+                        now + (Main.INSTANCE.sessionMaxHours * 3600000L), (byte) 1, username);
                 Session.add(session);
             } else {
                 session = sessions.get(0);
-                session.isLoggedIn = 1;
+                session.isActive = 1;
                 Session.update(session);
             }
             Main.INSTANCE.logger.info("Login success for '" + username + "', using session " + session.id);
