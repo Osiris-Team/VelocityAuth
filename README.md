@@ -39,3 +39,7 @@ Authenticate players on your velocity server.
 - Logins the player. On success, forwards the player to the first server, restores permissions, creates a session
   so this player can rejoin without needing to login again.
 - Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
+
+#### /list sessions _(username)_
+- Lists all sessions or the sessions for the specified player. (Should only be used by admins.)
+- Permission: `velocityauth.list.sessions`
