@@ -6,8 +6,8 @@ import com.osiris.velocityauth.commands.*;
 import com.osiris.velocityauth.database.Database;
 import com.osiris.velocityauth.database.RegisteredUser;
 import com.osiris.velocityauth.database.Session;
-import com.osiris.velocityauth.perms.NoPermissionPlayer;
 import com.osiris.velocityauth.perms.MutablePermissionProvider;
+import com.osiris.velocityauth.perms.NoPermissionPlayer;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
@@ -45,6 +47,8 @@ public class Main {
     public int sessionMaxHours;
     public List<NoPermissionPlayer> noPermissionPlayers = new CopyOnWriteArrayList<>();
     public RegisteredServer authServer;
+    public int minFailedLoginsForBan;
+    public int failedLoginBanTimeSeconds;
 
     @Inject
     public Main(ProxyServer proxy, Logger logger, @DataDirectory Path dataDirectory) {
@@ -86,24 +90,26 @@ public class Main {
         Database.password = config.databasePassword.asString();
         isWhitelistMode = config.whitelistMode.asBoolean();
         sessionMaxHours = config.sessionMaxHours.asInt();
-        logger.info("Loaded configuration. "+(System.currentTimeMillis()-now)+"ms");
+        minFailedLoginsForBan = config.minFailedLoginsForBan.asInt();
+        failedLoginBanTimeSeconds = config.failedLoginBanTime.asInt();
+        logger.info("Loaded configuration. " + (System.currentTimeMillis() - now) + "ms");
         now = System.currentTimeMillis();
 
-        if(config.debugAuthServerName.asString() != null){
+        if (config.debugAuthServerName.asString() != null) {
             authServer = proxy.getServer(config.debugAuthServerName.asString()).get();
-            logger.info("Using alternative/custom auth-server ("+authServer.getServerInfo().getAddress().toString()+
-                    "). "+(System.currentTimeMillis()-now)+"ms");
+            logger.info("Using alternative/custom auth-server (" + authServer.getServerInfo().getAddress().toString() +
+                    "). " + (System.currentTimeMillis() - now) + "ms");
         } else {
             limboServer = new LimboServer();
             limboServer.start();
             authServer = limboServer.registeredServer;
-            logger.info("Started limbo auth-server (localhost:"+limboServer.port+"/running:"+limboServer.process.isAlive()+"). "
-                    +(System.currentTimeMillis()-now)+"ms");
+            logger.info("Started limbo auth-server (localhost:" + limboServer.port + "/running:" + limboServer.process.isAlive() + "). "
+                    + (System.currentTimeMillis() - now) + "ms");
         }
         now = System.currentTimeMillis();
 
         Database.create();
-        logger.info("Database connected. "+(System.currentTimeMillis()-now)+"ms");
+        logger.info("Database connected. " + (System.currentTimeMillis() - now) + "ms");
         now = System.currentTimeMillis();
 
         proxy.getEventManager().register(this, PreLoginEvent.class, PostOrder.FIRST, e -> {
@@ -140,10 +146,10 @@ public class Main {
             // Called once at permissions init for anything that can have permissions
             // like the VelocityConsole or the Player object.
             // At this state, the player is not logged in.
-            try{
+            try {
                 // Remove all permissions of the user, if not logged in
                 // and restore them later, when logged in.
-                if(e.getSubject() instanceof Player){
+                if (e.getSubject() instanceof Player) {
 
                     // Make sure that all permission providers for players are mutable
                     MutablePermissionProvider permissionProvider =
@@ -151,7 +157,7 @@ public class Main {
                     e.setProvider(permissionProvider);
 
                     Player player = (Player) e.getSubject();
-                    if (!isLoggedIn(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())){
+                    if (!isLoggedIn(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())) {
                         Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
                         permissionProvider.hasPermission = NoPermissionPlayer.tempPermissionFunction;
                         noPermissionPlayers.add(new NoPermissionPlayer(
@@ -189,6 +195,7 @@ public class Main {
                         }
                         Thread.sleep(1000);
                     }
+                } catch (InterruptedException ignored) {
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
@@ -209,7 +216,7 @@ public class Main {
                 exception.printStackTrace();
             }
         });
-        logger.info("Listeners registered. "+(System.currentTimeMillis()-now)+"ms");
+        logger.info("Listeners registered. " + (System.currentTimeMillis() - now) + "ms");
         now = System.currentTimeMillis();
 
         new AdminRegisterCommand().register();
@@ -217,9 +224,10 @@ public class Main {
         new AdminLoginCommand().register();
         new RegisterCommand().register();
         new LoginCommand().register();
-        logger.info("Commands registered. "+(System.currentTimeMillis()-now)+"ms");
+        new BanCommand().register();
+        logger.info("Commands registered. " + (System.currentTimeMillis() - now) + "ms");
 
-        logger.info("Initialised successfully! "+(System.currentTimeMillis()-start)+"ms");
+        logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");
     }
 
     public boolean isLoggedIn(String username, String ipAddress) throws Exception {

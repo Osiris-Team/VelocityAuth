@@ -6,7 +6,6 @@ import com.osiris.velocityauth.database.Session;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 public final class AdminUnRegisterCommand implements Command {
 
@@ -49,17 +48,17 @@ public final class AdminUnRegisterCommand implements Command {
 
     @Override
     public String execute(Object... args) throws Exception {
-        if(args.length != 1) return "Failed! Required 1 arguments: <username>";
+        if (args.length != 1) return "Failed! Required 1 arguments: <username>";
         String username = (String) args[0];
-        if(!Main.INSTANCE.isRegistered(username))
-            return "Failed! No registered player named '"+username+"' found!";
+        if (!Main.INSTANCE.isRegistered(username))
+            return "Failed! No registered player named '" + username + "' found!";
         try {
             RegisteredUser user = RegisteredUser.get("username=?", username).get(0);
             RegisteredUser.remove(user);
             for (Session session : Session.get("username=?", username)) {
                 Session.remove(session);
             }
-            Main.INSTANCE.logger.info("Unregister success for '"+username+"', removed id "+user.id+" and related sessions");
+            Main.INSTANCE.logger.info("Unregister success for '" + username + "', removed id " + user.id + " and related sessions");
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed! Details could not be added to the database.";

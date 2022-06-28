@@ -42,11 +42,11 @@ public class LimboServer {
                 zip.extractFile("limbo-server/", pluginDir.getAbsolutePath()); // plugindir/limbo-server
             }
             // Download limbo server jar
-            try(ReadableByteChannel readableByteChannel = Channels.newChannel(new URL("" +
+            try (ReadableByteChannel readableByteChannel = Channels.newChannel(new URL("" +
                     "https://ci.loohpjames.com/job/Limbo/lastSuccessfulBuild/artifact/target/Limbo-0.6.16-ALPHA-1.19.jar")
-                    .openStream());){
-                if(!jar.exists()) jar.createNewFile();
-                try(FileChannel c = new FileOutputStream(jar).getChannel();){
+                    .openStream())) {
+                if (!jar.exists()) jar.createNewFile();
+                try (FileChannel c = new FileOutputStream(jar).getChannel()) {
                     c.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
                 }
             }
@@ -57,33 +57,33 @@ public class LimboServer {
         try (BufferedReader reader = new BufferedReader(new FileReader(dir + "/server.properties"))) {
             properties.load(reader);
         }
-        properties.put("allow-flight", ""+true);
-        properties.put("allow-chat", ""+false);
-        properties.put("bungeecord", ""+true);
+        properties.put("allow-flight", "" + true);
+        properties.put("allow-chat", "" + false);
+        properties.put("bungeecord", "" + true);
         properties.put("default-gamemode", "spectator");
         File velocityToml = new File(pluginJar.getParentFile().getParentFile() + "/velocity.toml");
         if (!velocityToml.exists())
-            throw new FileNotFoundException("File does not exist or failed to find: "+velocityToml);
+            throw new FileNotFoundException("File does not exist or failed to find: " + velocityToml);
         String forwardingSecret = new Toml().read(velocityToml)
                 .getString("forwarding-secret");
-        if(forwardingSecret == null || forwardingSecret.trim().isEmpty()){
+        if (forwardingSecret == null || forwardingSecret.trim().isEmpty()) {
             String forwardingSecretFilePath = new Toml().read(velocityToml).getString("forwarding-secret-file");
-            if(forwardingSecretFilePath == null || forwardingSecretFilePath.trim().isEmpty())
-                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: "+velocityToml);
+            if (forwardingSecretFilePath == null || forwardingSecretFilePath.trim().isEmpty())
+                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: " + velocityToml);
             File forwadingSecretFile = null;
-            if(forwardingSecretFilePath.startsWith("/") || forwardingSecretFilePath.startsWith("\\"))
-                forwadingSecretFile = new File(velocityToml.getParentFile()+forwardingSecretFilePath);
+            if (forwardingSecretFilePath.startsWith("/") || forwardingSecretFilePath.startsWith("\\"))
+                forwadingSecretFile = new File(velocityToml.getParentFile() + forwardingSecretFilePath);
             else
-                forwadingSecretFile = new File(velocityToml.getParentFile()+"/"+forwardingSecretFilePath);
-            if(!forwadingSecretFile.exists())
-                throw new FileNotFoundException("Failed to find file containing 'forwarding-secret'. Does not exist: "+forwadingSecretFile);
+                forwadingSecretFile = new File(velocityToml.getParentFile() + "/" + forwardingSecretFilePath);
+            if (!forwadingSecretFile.exists())
+                throw new FileNotFoundException("Failed to find file containing 'forwarding-secret'. Does not exist: " + forwadingSecretFile);
             forwardingSecret = new String(Files.readAllBytes(forwadingSecretFile.toPath()), StandardCharsets.UTF_8);
-            if(forwardingSecret.trim().isEmpty())
-                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: "+velocityToml);
+            if (forwardingSecret.trim().isEmpty())
+                throw new NullPointerException("The 'forwarding-secret' or 'forwarding-secret-file' fields cannot be null or empty! Checked config: " + velocityToml);
         }
         properties.put("forwarding-secrets", forwardingSecret);
-        properties.put("velocity-modern", ""+true);
-        properties.put("server-port", ""+port);
+        properties.put("velocity-modern", "" + true);
+        properties.put("server-port", "" + port);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dir + "/server.properties"))) {
             properties.store(writer, null);
         }
@@ -93,19 +93,19 @@ public class LimboServer {
 
         process = new ProcessBuilder()
                 .directory(dir)
-                .command("java","-Dorg.jline.terminal.dumb=true", "-jar", jar.getAbsolutePath(), "--nogui")
+                .command("java", "-Dorg.jline.terminal.dumb=true", "-jar", jar.getAbsolutePath(), "--nogui")
                 .start();
 
-        if(errorReaderThread != null) errorReaderThread.interrupt();
+        if (errorReaderThread != null) errorReaderThread.interrupt();
         errorReaderThread = new Thread(() -> {
-           try(BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))){
-               String line = null;
-               while ((line = reader.readLine()) != null){
-                   System.err.println("(error-limbo) "+line);
-               }
-           } catch (Exception e) {
-               e.printStackTrace();
-           }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    System.err.println("(error-limbo) " + line);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         errorReaderThread.start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

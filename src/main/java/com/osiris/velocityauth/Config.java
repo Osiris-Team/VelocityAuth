@@ -16,6 +16,8 @@ public class Config extends Yaml {
     public YamlSection whitelistMode;
     public YamlSection sessionMaxHours;
     public YamlSection debugAuthServerName;
+    public YamlSection minFailedLoginsForBan;
+    public YamlSection failedLoginBanTime;
 
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
         super(new File(Main.INSTANCE.dataDirectory + "/config.yml"));
@@ -38,11 +40,22 @@ public class Config extends Yaml {
         sessionMaxHours = this.put("session", "max-hours-valid").setDefValues("720").setComments("The maximum time (hours) a session is valid.",
                 "Default is one month (30 days * 24h = 720h).");
 
+
+        minFailedLoginsForBan = this.put("failed-logins").setCountTopLineBreaks(1)
+                .setComments("The amount of failed logins required (within the last minute) before temporarily banning the player.",
+                        "Default is 5 attempts.")
+                .setDefValues("5");
+        failedLoginBanTime = this.put("ban-time")
+                .setComments("The time in seconds the user will be banned when failing the above count of logins.",
+                        "Default is 10 seconds.")
+                .setDefValues("10");
+
+
         this.put("debug").setCountTopLineBreaks(1).setComments("Options useful for debugging stuff.",
                 "Could disappear in future releases without notice.",
                 "Changing any of this values not advised.");
         debugAuthServerName = this.put("debug", "auth-server-name").setComments("When null, default pre-installed limbo server will",
-        "be started and used. Otherwise the provided server will be used as auth-server.");
+                "be started and used. Otherwise the provided server will be used as auth-server.");
         this.save();
     }
 }

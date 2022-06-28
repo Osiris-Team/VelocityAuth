@@ -10,11 +10,6 @@ import java.util.function.Predicate;
 public class MutablePermissionProvider implements PermissionProvider {
 
     public Predicate<String> hasPermission;
-
-    public MutablePermissionProvider(Predicate<String> hasPermission) {
-        this.hasPermission = hasPermission;
-    }
-
     /**
      * This permission function wraps around {@link #hasPermission}
      * and thus its logic is completely mutable.
@@ -25,6 +20,10 @@ public class MutablePermissionProvider implements PermissionProvider {
             return hasPermission.test(permission) ? Tristate.TRUE : Tristate.FALSE;
         }
     };
+
+    public MutablePermissionProvider(Predicate<String> hasPermission) {
+        this.hasPermission = hasPermission;
+    }
 
     @Override
     public PermissionFunction createFunction(PermissionSubject subject) {

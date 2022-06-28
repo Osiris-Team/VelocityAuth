@@ -48,16 +48,16 @@ public final class AdminRegisterCommand implements Command {
 
     @Override
     public String execute(Object... args) throws Exception {
-        if(args.length != 2) return "Failed! Required 2 arguments: <username> <password>";
+        if (args.length != 2) return "Failed! Required 2 arguments: <username> <password>";
         String username = ((String) args[0]).trim();
         String password = ((String) args[1]).trim();
-        if(Main.INSTANCE.isRegistered(username))
+        if (Main.INSTANCE.isRegistered(username))
             return "Failed! Already registered!";
         String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
         try {
             RegisteredUser user = RegisteredUser.create(username, encodedPassword);
             RegisteredUser.add(user);
-            Main.INSTANCE.logger.info("Register success for '"+username+"', assigned id "+user.id);
+            Main.INSTANCE.logger.info("Register success for '" + username + "', assigned id " + user.id);
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed! Details could not be added to the database.";
