@@ -238,7 +238,7 @@ public class BannedUser {
     }
 
     public static boolean isBanned(String uuid, String ipAddress) throws Exception {
-        return getBannedUUIDs(uuid).isEmpty() && getBannedIpAddresses(ipAddress).isEmpty();
+        return !getBannedUUIDs(uuid).isEmpty() && !getBannedIpAddresses(ipAddress).isEmpty();
     }
 
     public static List<BannedUser> getBannedUUIDs(String uuid) throws Exception {

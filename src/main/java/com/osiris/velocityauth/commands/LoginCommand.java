@@ -40,7 +40,7 @@ public class LoginCommand implements Command {
             if (source instanceof Player) {
                 Player player = (Player) source;
                 try {
-                    if (FailedLogin.get("uuid=? AND timestamp > (?-60000)", player.getUniqueId(), System.currentTimeMillis())
+                    if (FailedLogin.get("uuid=? AND timestamp > (?-60000)", player.getUniqueId().toString(), System.currentTimeMillis())
                             .size() >= Main.INSTANCE.minFailedLoginsForBan) {
 
                     }

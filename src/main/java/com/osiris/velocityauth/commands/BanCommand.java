@@ -25,7 +25,7 @@ public final class BanCommand implements Command {
         String password = args[1];
         String ipAddress = args[2];
         try {
-            String error = execute(username, password, ipAddress);
+                                                                                                                                                                                    String error = execute(username, password, ipAddress);
             if (error == null) {
                 source.sendMessage(Component.text("Login success!"));
             } else {

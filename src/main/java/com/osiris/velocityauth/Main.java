@@ -132,7 +132,8 @@ public class Main {
             try {
                 if(BannedUser.isBanned(e.getPlayer().getUniqueId().toString(),
                         e.getPlayer().getRemoteAddress().getAddress().getHostAddress())){
-                    BannedUser bannedUser = BannedUser.getBannedUUIDs(e.getPlayer().getUniqueId().toString()).get(0);
+                    BannedUser bannedUser = BannedUser.getBannedUUIDs(e.getPlayer().getUniqueId().toString())
+                            .get(0);
                     Component message = new BanCommand().getBanText(bannedUser.timestampExpires, bannedUser.reason);
                     e.getPlayer().disconnect(message);
                     logger.info("Blocked connection for " + e.getPlayer().getUsername()+"/"+e.getPlayer().getUniqueId().toString()
