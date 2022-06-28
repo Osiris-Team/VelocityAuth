@@ -10,6 +10,8 @@ Authenticate players on your velocity server.
   , by changing the permissions function of the player.  
 - Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
 - Prevents join blocking (username spoofing / can only happen in offline mode).
+- Secured against password timing attacks.
+- Secured against password spamming attacks, by temp-banning those players (configurable).
 - Whitelist mode to completely block not registered players from joining.
 
 ## Usage
