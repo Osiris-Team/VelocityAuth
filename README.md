@@ -17,9 +17,7 @@ Authenticate players on your velocity server.
 2. Put the jar into your velocity /plugins folder.
 3. Start your velocity server/proxy.
 
-## Commands
-
-### Player commands
+## Player commands
 
 #### /register _password_ _confirm-password_
 - Registers the player.
@@ -30,7 +28,7 @@ Authenticate players on your velocity server.
   so this player can rejoin without needing to login again.
 - Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
 
-### Admin commands
+## Admin commands
 
 #### /a_register _username_ _password_
 - Registers the provided player.
