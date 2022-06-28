@@ -176,8 +176,7 @@ public class Main {
                     e.setProvider(permissionProvider);
 
                     Player player = (Player) e.getSubject();
-                    if (getValidSession(player.getUsername(), player.getRemoteAddress().getAddress().getHostName())
-                    == null) {
+                    if (getValidSession(player) == null) {
                         Predicate<String> oldPermissionFunction = permissionProvider.hasPermission;
                         permissionProvider.hasPermission = NoPermissionPlayer.tempPermissionFunction;
                         noPermissionPlayers.add(new NoPermissionPlayer(
@@ -206,8 +205,7 @@ public class Main {
                         Thread.sleep(1000);
                     }
                     for (int i = maxSeconds; i >= 0; i--) {
-                        if (!e.getPlayer().isActive() || getValidSession(e.getPlayer().getUsername(),
-                                e.getPlayer().getRemoteAddress().getAddress().getHostName()) != null)
+                        if (!e.getPlayer().isActive() || getValidSession(e.getPlayer()) != null)
                             break;
                         e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
                         if (i == 0) {
@@ -217,8 +215,7 @@ public class Main {
                         Thread.sleep(1000);
                     }
 
-                    Session session = getValidSession(e.getPlayer().getUsername(),
-                            e.getPlayer().getRemoteAddress().getAddress().getHostName());
+                    Session session = getValidSession(e.getPlayer());
                     if(session != null){
                         session.isActive = 1;
                         Session.update(session);
@@ -258,6 +255,11 @@ public class Main {
         logger.info("Commands registered. " + (System.currentTimeMillis() - now) + "ms");
 
         logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    public Session getValidSession(Player player) throws Exception {
+        return getValidSession(player.getUsername(),
+                player.getRemoteAddress().getAddress().getHostName());
     }
 
     /**

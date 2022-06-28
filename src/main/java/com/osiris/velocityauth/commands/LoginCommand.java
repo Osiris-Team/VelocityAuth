@@ -42,53 +42,54 @@ public class LoginCommand implements Command {
                 try {
                     if (FailedLogin.get("uuid=? AND timestamp > (?-60000)", player.getUniqueId().toString(), System.currentTimeMillis())
                             .size() >= Main.INSTANCE.minFailedLoginsForBan) {
-
+                        new BanCommand().execute(player.getUsername(), player.getUniqueId().toString(), player.getRemoteAddress().getAddress().getHostAddress(),
+                                System.currentTimeMillis()+(Main.INSTANCE.failedLoginBanTimeSeconds * 1000L), "Too many failed login attempts.");
                     }
                     if (args.length != 1) {
                         sendFailedLogin(player, "Failed! Requires 1 argument: <password>");
                         return;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    sendFailedLogin(player, "Failed! " + e.getMessage());
-                }
-                String password = args[0];
-                try {
-                    String error = new AdminLoginCommand().execute(player.getUsername(), password,
-                            player.getRemoteAddress().getAddress().getHostAddress());
-                    if (error == null) {
-                        source.sendMessage(Component.text("Logged in!"));
-                    } else {
-                        sendFailedLogin(player, error);
+                    String password = args[0];
+                    try {
+                        String error = new AdminLoginCommand().execute(player.getUsername(), password,
+                                player.getRemoteAddress().getAddress().getHostAddress());
+                        if (error == null) {
+                            source.sendMessage(Component.text("Logged in!"));
+                        } else {
+                            sendFailedLogin(player, error);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        sendFailedLogin(player, "Failed! Details could not be added to the database.");
                         return;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    sendFailedLogin(player, "Failed! Details could not be added to the database.");
-                    return;
-                }
 
-                // Restore default permission function
-                try {
-                    for (NoPermissionPlayer perm : Main.INSTANCE.noPermissionPlayers) {
-                        if (Objects.equals(perm.player.getUniqueId(), player.getUniqueId())) {
-                            perm.permissionProvider.hasPermission = perm.oldPermissionFunction;
-                            Main.INSTANCE.noPermissionPlayers.remove(perm);
+                    // Restore default permission function
+                    try {
+                        for (NoPermissionPlayer perm : Main.INSTANCE.noPermissionPlayers) {
+                            if (Objects.equals(perm.player.getUniqueId(), player.getUniqueId())) {
+                                perm.permissionProvider.hasPermission = perm.oldPermissionFunction;
+                                Main.INSTANCE.noPermissionPlayers.remove(perm);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        sendFailedLogin(player, "Failed! " + e.getMessage());
+                    }
+
+                    // Forward user to first server
+                    for (RegisteredServer s : Main.INSTANCE.proxy.getAllServers()) {
+                        if (!Objects.equals(s.getServerInfo().getName(), Main.INSTANCE.authServer.getServerInfo().getName())) {
+                            player.createConnectionRequest(s).fireAndForget();
+                            return;
                         }
                     }
+                    source.sendMessage(Component.text("Unable to forward to another server, because there aren't any.", TextColor.color(255, 0, 0)));
                 } catch (Exception e) {
                     e.printStackTrace();
                     sendFailedLogin(player, "Failed! " + e.getMessage());
                 }
-
-                // Forward user to first server
-                for (RegisteredServer s : Main.INSTANCE.proxy.getAllServers()) {
-                    if (!Objects.equals(s.getServerInfo().getName(), Main.INSTANCE.authServer.getServerInfo().getName())) {
-                        player.createConnectionRequest(s).fireAndForget();
-                        return;
-                    }
-                }
-                source.sendMessage(Component.text("Unable to forward to another server, because there aren't any.", TextColor.color(255, 0, 0)));
             } else
                 Main.INSTANCE.logger.error("Failed! Must be player to execute this command.");
         }).schedule();
