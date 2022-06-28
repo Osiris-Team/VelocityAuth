@@ -19,17 +19,7 @@ Authenticate players on your velocity server.
 
 ## Commands
 
-#### /a_register _username_ _password_
-- Registers the provided player. (Should only be used by admins.)
-- Permission: `velocityauth.admin.register`
-
-#### /a_unregister _username_
-- Unregisters the provided player. (Should only be used by admins.)
-- Permission: `velocityauth.admin.unregister`
-
-#### /a_login _username_ _password_
-- Logins the provided player. (Should only be used by admins.)
-- Permission: `velocityauth.admin.login`
+### Player commands
 
 #### /register _password_ _confirm-password_
 - Registers the player.
@@ -40,6 +30,26 @@ Authenticate players on your velocity server.
   so this player can rejoin without needing to login again.
 - Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
 
-#### /list sessions _(username)_
-- Lists all sessions or the sessions for the specified player. (Should only be used by admins.)
+### Admin commands
+
+#### /a_register _username_ _password_
+- Registers the provided player.
+- Permission: `velocityauth.admin.register`
+
+#### /a_unregister _username_
+- Unregisters the provided player. 
+- Permission: `velocityauth.admin.unregister`
+
+#### /a_login _username_ _password_
+- Logins the provided player.
+- Permission: `velocityauth.admin.login`
+
+#### /list_sessions _(username)_
+- Lists all sessions. 
+- Lists sessions for the specified player, if username provided.
+- Permission: `velocityauth.list.sessions`
+
+#### /clear_sessions _(username)_
+- Removes/Clears all sessions from the database.
+- Removes/Clears all sessions from the database for the specified player, if username provided.
 - Permission: `velocityauth.list.sessions`

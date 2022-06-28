@@ -33,17 +33,35 @@ public class ClearSessionsCommand implements Command {
         CommandSource source = invocation.source();
         String[] args = invocation.arguments();
         int countSessions = 0, countSessionsRemove = 0;
-        try {
-            List<Session> list = Session.get();
-            countSessions = list.size();
-            for (Session session : list) {
-                Session.remove(session);
-                countSessionsRemove++;
+        String username = null;
+        if (args.length == 1) {
+            username = ((String)args[0]).trim();
+            try {
+                List<Session> list = Session.get("username=?", username);
+                countSessions = list.size();
+                for (Session session : list) {
+                    Session.remove(session);
+                    countSessionsRemove++;
+                }
+                source.sendMessage(Component.text("Removed "+countSessionsRemove+"/"+countSessions+" sessions! "));
+            } catch (Exception e) {
+                e.printStackTrace();
+                source.sendMessage(Component.text("Failed! Removed "+countSessionsRemove+"/"+countSessions+" sessions! " + e.getMessage(), TextColor.color(255, 0, 0)));
             }
-            source.sendMessage(Component.text("Removed "+countSessionsRemove+"/"+countSessions+" sessions! "));
-        } catch (Exception e) {
-            e.printStackTrace();
-            source.sendMessage(Component.text("Failed! Removed "+countSessionsRemove+"/"+countSessions+" sessions! " + e.getMessage(), TextColor.color(255, 0, 0)));
+        }
+        else{
+            try {
+                List<Session> list = Session.get();
+                countSessions = list.size();
+                for (Session session : list) {
+                    Session.remove(session);
+                    countSessionsRemove++;
+                }
+                source.sendMessage(Component.text("Removed "+countSessionsRemove+"/"+countSessions+" sessions! "));
+            } catch (Exception e) {
+                e.printStackTrace();
+                source.sendMessage(Component.text("Failed! Removed "+countSessionsRemove+"/"+countSessions+" sessions! " + e.getMessage(), TextColor.color(255, 0, 0)));
+            }
         }
     }
 }
