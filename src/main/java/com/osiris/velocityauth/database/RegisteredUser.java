@@ -177,4 +177,8 @@ public class RegisteredUser {
     public RegisteredUser clone() {
         return new RegisteredUser(this.id, this.username, this.password);
     }
+
+    public String toPrintString(){
+        return  ""+"id="+this.id+" "+"username="+this.username+" "+"password="+this.password+" ";
+    }
 }

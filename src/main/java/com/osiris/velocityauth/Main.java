@@ -242,6 +242,7 @@ public class Main {
         new RegisterCommand().register();
         new LoginCommand().register();
         new BanCommand().register();
+        new ListSessionsCommand().register();
         logger.info("Commands registered. " + (System.currentTimeMillis() - now) + "ms");
 
         logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");

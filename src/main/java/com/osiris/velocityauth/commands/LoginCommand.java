@@ -99,7 +99,7 @@ public class LoginCommand implements Command {
             player.sendMessage(Component.text(reason, TextColor.color(255, 0, 0)));
             FailedLogin.add(FailedLogin.create(player.getUsername(),
                     player.getRemoteAddress().getAddress().getHostAddress(),
-                    System.currentTimeMillis(), reason));
+                    System.currentTimeMillis(), player.getUniqueId().toString(), reason));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

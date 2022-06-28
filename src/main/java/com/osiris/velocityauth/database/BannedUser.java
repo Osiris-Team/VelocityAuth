@@ -256,5 +256,8 @@ public class BannedUser {
     public BannedUser clone() {
         return new BannedUser(this.id, this.username, this.ipAddress, this.timestampExpires, this.uuid, this.reason);
     }
+    public String toPrintString(){
+        return  ""+"id="+this.id+" "+"username="+this.username+" "+"ipAddress="+this.ipAddress+" "+"timestampExpires="+this.timestampExpires+" "+"uuid="+this.uuid+" "+"reason="+this.reason+" ";
+    }
 }
 

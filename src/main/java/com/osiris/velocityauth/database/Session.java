@@ -240,4 +240,7 @@ public class Session {
     public Session clone() {
         return new Session(this.id, this.userId, this.ipAddress, this.timestampExpires, this.isLoggedIn, this.username);
     }
+    public String toPrintString(){
+        return  ""+"id="+this.id+" "+"userId="+this.userId+" "+"ipAddress="+this.ipAddress+" "+"timestampExpires="+this.timestampExpires+" "+"isLoggedIn="+this.isLoggedIn+" "+"username="+this.username+" ";
+    }
 }
