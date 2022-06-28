@@ -12,6 +12,7 @@ Authenticate players on your velocity server.
 - Prevents join blocking (username spoofing / can only happen in offline mode).
 - Secured against password timing attacks.
 - Secured against password spamming attacks, by temp-banning those players (configurable).
+- Secured against SQL injection.
 - Whitelist mode to completely block not registered players from joining.
 
 ## Usage
