@@ -277,9 +277,13 @@ public class Main {
      */
     public Session getValidSession(String username, String ipAddress) throws Exception {
         List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
-        if (sessions.isEmpty()) return null;
+        if (sessions.isEmpty()) {
+            System.err.println("Sessions list empty! Failed to find username='"+username+"' AND ipAddress='"+ipAddress+"'");
+            return null;
+        }
         if(sessions.size() > 1) throw new RuntimeException("Cannot have multiple("+sessions.size()
                 +") sessions for one username("+username+")/ip-address("+ipAddress+").");
+        System.err.println("Found session! "+sessions.get(0).id);
         return sessions.get(0);
     }
 
