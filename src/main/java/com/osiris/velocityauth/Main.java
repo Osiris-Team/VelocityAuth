@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -204,6 +205,10 @@ public class Main {
                         Thread.sleep(1000);
                     }
                     for (int i = maxSeconds; i >= 0; i--) {
+                        System.err.println(Instant.now().toString());
+                        for (Session session : Session.get()) {
+                            System.err.println(session.toPrintString());
+                        }
                         if (!e.getPlayer().isActive() || hasValidSession(e.getPlayer()))
                             break;
                         e.getPlayer().sendActionBar(Component.text(i + " seconds remaining to: /login <password>", TextColor.color(184, 25, 43)));
