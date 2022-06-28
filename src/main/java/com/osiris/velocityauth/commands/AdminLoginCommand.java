@@ -61,7 +61,7 @@ public final class AdminLoginCommand implements Command {
         String password = ((String) args[1]).trim();
         String ipAddress = ((String) args[2]).trim();
         if (Main.INSTANCE.hasValidSession(username, ipAddress))
-            return "Failed! Already logged in. Your current session: "+Main.INSTANCE.getValidSession(username, ipAddress);
+            return "Failed! Already logged in. Your current session: "+Main.INSTANCE.getValidSession(username, ipAddress).toPrintString();
         List<RegisteredUser> registeredUsers = RegisteredUser.get("username=?", username);
         if (registeredUsers.isEmpty())
             return "Failed! Could not find registered user named '" + username + "' in database.";
