@@ -19,18 +19,18 @@ Authenticate players on your velocity server.
 
 ## Player commands
 
-#### <ins>/register</ins> _password_ _confirm-password_
+#### /register _password_ _confirm-password_
 - Registers the player.
 - Permission: `velocityauth.register` (Players have this permission by default when not logged in.)
 
-#### <ins>/login</ins> _password_
+#### /login _password_
 - Logins the player. On success, forwards the player to the first server, restores permissions, creates a session
   so this player can rejoin without needing to login again.
 - Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
 
 ## Admin commands
 
-#### <ins>/a_register</ins> _username_ _password_
+#### /a_register _username_ _password_
 - Registers the provided player.
 - Permission: `velocityauth.admin.register`
 
