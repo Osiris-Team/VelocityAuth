@@ -2,18 +2,21 @@
 Authenticate players on your velocity server.
 
 ## Features
-- SQL database support.
-- Session based authentication (players only need to login once).
-- Pre-configured, auto-installed and auto-started limbo auth-server.
-- Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
-- Blocks all proxy command execution for not logged in players (except the /register and /login commands)
+- Basics
+  - SQL database support.
+  - Session based authentication (players only need to login once).
+  - Pre-configured, auto-installed and auto-started limbo auth-server.
+  - Whitelist mode to completely block not registered players from joining.
+- Security
+  - Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
+  - Blocks all proxy command execution for not logged in players (except the /register and /login commands)
   , by changing the permissions function of the player.  
-- Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
-- Prevents join blocking (username spoofing / can only happen in offline mode).
-- Secured against password timing attacks.
-- Secured against password spamming attacks, by temp-banning those players (configurable).
-- Secured against SQL injection.
-- Whitelist mode to completely block not registered players from joining.
+  - Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
+  - Prevents join blocking (username spoofing / can only happen in offline mode).
+  - Secured against password timing attacks.
+  - Secured against password spamming attacks, by temp-banning those players (configurable).
+  - Secured against SQL injection.
+
 
 ## Usage
 1. Download `VelocityAuth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
