@@ -3,14 +3,17 @@ package com.osiris.velocityauth;
 import com.google.inject.Inject;
 import com.osiris.dyml.exceptions.*;
 import com.osiris.velocityauth.commands.*;
+import com.osiris.velocityauth.database.BannedUser;
 import com.osiris.velocityauth.database.Database;
 import com.osiris.velocityauth.database.RegisteredUser;
 import com.osiris.velocityauth.database.Session;
 import com.osiris.velocityauth.perms.MutablePermissionProvider;
 import com.osiris.velocityauth.perms.NoPermissionPlayer;
+import com.osiris.velocityauth.utils.UtilsTime;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
@@ -120,6 +123,20 @@ public class Main {
                     ));
                     logger.info("Blocked connection for " + e.getUsername() + ". Player not registered (whitelist-mode).");
                     return;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+        proxy.getEventManager().register(this, LoginEvent.class, PostOrder.FIRST, e -> {
+            try {
+                if(BannedUser.isBanned(e.getPlayer().getUniqueId().toString(),
+                        e.getPlayer().getRemoteAddress().getAddress().getHostAddress())){
+                    BannedUser bannedUser = BannedUser.getBannedUUIDs(e.getPlayer().getUniqueId().toString()).get(0);
+                    Component message = new BanCommand().getBanText(bannedUser.timestampExpires, bannedUser.reason);
+                    e.getPlayer().disconnect(message);
+                    logger.info("Blocked connection for " + e.getPlayer().getUsername()+"/"+e.getPlayer().getUniqueId().toString()
+                            + ". Player is banned for "+new UtilsTime().getFormattedString(bannedUser.timestampExpires)+".");
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
