@@ -1,5 +1,5 @@
 # VelocityAuth
-Authenticate players on your velocity server.
+Authenticate players on your velocity proxy (1.19 support)
 
 ## Features
 - Basics
