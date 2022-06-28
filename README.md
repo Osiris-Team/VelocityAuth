@@ -50,4 +50,4 @@ Authenticate players on your velocity server.
 #### /clear_sessions _(username)_
 - Removes/Clears all sessions from the database.
 - Removes/Clears all sessions from the database for the specified player, if username provided.
-- Permission: `velocityauth.list.sessions`
+- Permission: `velocityauth.clear.sessions`
