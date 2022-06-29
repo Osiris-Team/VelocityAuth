@@ -85,7 +85,7 @@ public final class BanCommand implements Command {
 
     public Component getBanText(long timestampExpires, String reason) {
         return Component.text("You have been banned for " + new UtilsTime().getFormattedString(timestampExpires - System.currentTimeMillis())
-                + ". Reason:" + reason, TextColor.color(255, 0, 0));
+                + ". Reason: " + reason, TextColor.color(255, 0, 0));
     }
 
 }
