@@ -52,7 +52,7 @@ public class LoginCommand implements Command {
                     String password = args[0];
                     try {
                         String error = new AdminLoginCommand().execute(player.getUsername(), password,
-                                player.getRemoteAddress().getAddress().getHostAddress());
+                                Main.INSTANCE.getPlayerIp(player));
                         if (error == null) {
                             source.sendMessage(Component.text("Logged in!"));
                         } else {

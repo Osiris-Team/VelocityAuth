@@ -260,12 +260,15 @@ public class Main {
         logger.info("Initialised successfully! " + (System.currentTimeMillis() - start) + "ms");
     }
 
+    public String getPlayerIp(Player player){
+        return player.getRemoteAddress().getAddress().getHostAddress();
+    }
+
     public boolean hasValidSession(Player player) throws Exception {
         return getValidSession(player) != null;
     }
     public Session getValidSession(Player player) throws Exception {
-        return getValidSession(player.getUsername(),
-                player.getRemoteAddress().getAddress().getHostName());
+        return getValidSession(player.getUsername(), getPlayerIp(player));
     }
 
     public boolean hasValidSession(String username, String ipAddress) throws Exception {
@@ -278,12 +281,10 @@ public class Main {
     public Session getValidSession(String username, String ipAddress) throws Exception {
         List<Session> sessions = Session.get("username=? AND ipAddress=?", username, ipAddress);
         if (sessions.isEmpty()) {
-            System.err.println("Sessions list empty! Failed to find username='"+username+"' AND ipAddress='"+ipAddress+"'");
             return null;
         }
         if(sessions.size() > 1) throw new RuntimeException("Cannot have multiple("+sessions.size()
                 +") sessions for one username("+username+")/ip-address("+ipAddress+").");
-        System.err.println("Found session! "+sessions.get(0).id);
         return sessions.get(0);
     }
 
