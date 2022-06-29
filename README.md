@@ -7,6 +7,7 @@ Authenticate players on your velocity proxy (1.19 support)
   - Session based authentication (players only need to login once).
   - Pre-configured, auto-installed and auto-started limbo auth-server.
   - Whitelist mode to completely block not registered players from joining.
+  - Ban system
 - Security
   - Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
   - Blocks all proxy command execution for not logged in players (except the /register and /login commands)
