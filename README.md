@@ -28,13 +28,15 @@ Authenticate players on your velocity proxy (1.19 support)
 
 #### /register _password_ _confirm-password_
 - `velocityauth.register`
-- Registers the player. (Players have this permission by default when not logged in.)
+- Players have this permission by default when not logged in.
+- Registers the player.
 
 #### /login _password_
 - `velocityauth.login`
+- Players have this permission by default when not logged in.
 - Logins the player. On success, forwards the player to the first server, restores permissions, creates a session
-  so this player can rejoin without needing to login again. (Players have this permission by default when not logged in.)
-- Details: Failed logins get saved to a table, together with 
+  so this player can rejoin without needing to login again
+  Failed logins get saved to a table, together with 
   the UUID and IP of the player. If there are more than 5 failed attempts
   in the last hour, the player gets banned for 10 seconds on each
   following failed attempt.
@@ -56,17 +58,15 @@ Authenticate players on your velocity proxy (1.19 support)
 #### /ban _username_ (_hours_) (_reason_)
 - `velocityauth.ban`
 - Bans the player for 24h, with default reason: Your behavior violated our community guidelines and/or terms of service.
-- Details: The UUID and IP of the player get added to 
+  The UUID and IP of the player get added to 
   the banned players table. On each player join that table gets
   checked and if there is a match for the UUID OR IP,
   the connection is aborted.
 
 #### /list_sessions _(username)_
 - `velocityauth.list.sessions`
-- Lists all sessions. 
-- Lists sessions for the specified player, if username provided.
+- Lists all sessions, or the sessions for a specific player.
 
 #### /clear_sessions _(username)_
 - `velocityauth.clear.sessions`
-- Removes/Clears all sessions from the database.
-- Removes/Clears all sessions from the database for the specified player, if username provided.
+- Removes/Clears all sessions from the database, or the sessions for a specific player.
