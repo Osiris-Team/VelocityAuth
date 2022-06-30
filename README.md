@@ -14,7 +14,7 @@ Secure your velocity proxy within 3 steps (1.19 support)
   - Whitelist mode to completely block not registered players from joining.
   - Ban system, to block players from joining your proxy.
 - Security
-  - Not logged in players get automatically forwarded to the limbo auth-server (in spectator mode).
+  - Connections to other servers are blocked, if the player is not logged in, and  get automatically forwarded to the limbo auth-server (in spectator mode).
   - Blocks all proxy command execution for not logged in players (except the /register and /login commands)
   , by changing the permissions function of the player.  
   - Prevents kicking of already connected players (username spoofing / can only happen in offline mode).
