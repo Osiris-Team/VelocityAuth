@@ -53,6 +53,8 @@ public final class AdminRegisterCommand implements Command {
         String password = ((String) args[1]).trim();
         if (Main.INSTANCE.isRegistered(username))
             return "Failed! Already registered!";
+        if(password.length() < Main.INSTANCE.minPasswordLength)
+            return "Failed! Password too short. Minimum length is "+Main.INSTANCE.minPasswordLength+".";
         String encodedPassword = new Pbkdf2PasswordEncoder().encode(password);
         try {
             RegisteredUser user = RegisteredUser.create(username, encodedPassword);

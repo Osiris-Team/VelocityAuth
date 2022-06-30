@@ -33,6 +33,7 @@ Secure your velocity proxy within 3 steps (1.19 support)
 #### /login _password_
 - `velocityauth.login`
 - Players have this permission by default when not logged in.
+- The minimum password length is 10 (configurable). 
 - Logins the player. On success, forwards the player to the first server, restores permissions, and creates a session
   so this player can rejoin without needing to login again.
   Failed logins get saved to a table, together with 

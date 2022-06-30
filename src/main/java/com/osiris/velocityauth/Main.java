@@ -55,6 +55,7 @@ public class Main {
     public RegisteredServer authServer;
     public int minFailedLoginsForBan;
     public int failedLoginBanTimeSeconds;
+    public int minPasswordLength;
     public ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     @Inject
@@ -99,6 +100,7 @@ public class Main {
         sessionMaxHours = config.sessionMaxHours.asInt();
         minFailedLoginsForBan = config.minFailedLoginsForBan.asInt();
         failedLoginBanTimeSeconds = config.failedLoginBanTime.asInt();
+        minPasswordLength = config.minPasswordLength.asInt();
         logger.info("Loaded configuration. " + (System.currentTimeMillis() - now) + "ms");
         now = System.currentTimeMillis();
 

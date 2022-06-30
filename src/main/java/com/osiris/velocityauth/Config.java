@@ -18,6 +18,7 @@ public class Config extends Yaml {
     public YamlSection debugAuthServerName;
     public YamlSection minFailedLoginsForBan;
     public YamlSection failedLoginBanTime;
+    public YamlSection minPasswordLength;
 
     public Config() throws YamlReaderException, YamlWriterException, IOException, DuplicateKeyException, IllegalListException, NotLoadedException, IllegalKeyException {
         super(new File(Main.INSTANCE.dataDirectory + "/config.yml"));
@@ -49,6 +50,7 @@ public class Config extends Yaml {
                 .setComments("The time in seconds the user will be banned when failing the above count of logins.",
                         "Default is 10 seconds.")
                 .setDefValues("10");
+        minPasswordLength = this.put("min-password-length").setDefValues("10");
 
 
         this.put("debug").setCountTopLineBreaks(1).setComments("Options useful for debugging stuff.",
