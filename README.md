@@ -37,7 +37,7 @@ Authenticate players on your velocity proxy (1.19 support)
 - Logins the player. On success, forwards the player to the first server, restores permissions, and creates a session
   so this player can rejoin without needing to login again.
   Failed logins get saved to a table, together with 
-  the UUID and IP of the player. If there are more than 5 failed attempts
+  the UUID and IP of the player. If there are more than 5 failed attempts (for the same UUID OR IP)
   in the last hour, the player gets banned for 10 seconds on each
   following failed attempt.
 
