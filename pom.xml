@@ -6,7 +6,7 @@
 
     <groupId>com.osiris.velocityauth</groupId>
     <artifactId>velocityauth</artifactId>
-    <version>0.4</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>VelocityAuth</name>
