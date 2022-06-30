@@ -1,5 +1,5 @@
 # VelocityAuth
-Authenticate players on your velocity proxy (1.19 support)
+Secure your velocity proxy within 3 steps (1.19 support)
 
 ## Features
 - Basics
