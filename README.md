@@ -25,7 +25,7 @@ Secure your velocity proxy within 3 steps (1.19 support)
 
 ## Player commands
 
-#### /register <small>_password_ _confirm-password_</small>
+#### /register _password_ _confirm-password_
 - `velocityauth.register`
 - Players have this permission by default when not logged in.
 - Registers the player.
