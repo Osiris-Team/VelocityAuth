@@ -40,7 +40,9 @@ public class LoginCommand implements Command {
             if (source instanceof Player) {
                 Player player = (Player) source;
                 try {
-                    if (FailedLogin.get("uuid=? AND timestamp > (?-60000)", player.getUniqueId().toString(), System.currentTimeMillis())
+                    if (FailedLogin.get("(uuid=? OR ipAddress=?) AND timestamp > (?-60000)", player.getUniqueId().toString(),
+                            Main.INSTANCE.getPlayerIp(player),
+                            System.currentTimeMillis())
                             .size() >= Main.INSTANCE.minFailedLoginsForBan) {
                         new BanCommand().execute(player.getUsername(), player.getUniqueId().toString(), player.getRemoteAddress().getAddress().getHostAddress(),
                                 System.currentTimeMillis()+(Main.INSTANCE.failedLoginBanTimeSeconds * 1000L), "Too many failed login attempts.");

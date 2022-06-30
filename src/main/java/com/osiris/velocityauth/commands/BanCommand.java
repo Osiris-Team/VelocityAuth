@@ -2,6 +2,7 @@ package com.osiris.velocityauth.commands;
 
 import com.osiris.velocityauth.Main;
 import com.osiris.velocityauth.database.BannedUser;
+import com.osiris.velocityauth.utils.Arr;
 import com.osiris.velocityauth.utils.UtilsTime;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
@@ -16,16 +17,20 @@ public final class BanCommand implements Command {
     @Override
     public void execute(final Invocation invocation) {
         CommandSource source = invocation.source();
-        String[] args = invocation.arguments();
-        if (args.length != 3) {
-            source.sendMessage(Component.text("Failed! Requires 3 arguments: <username> <uuid> <ip-address>"));
+        Arr<String> args = new Arr<>(invocation.arguments());
+        if (args.length < 1) {
+            source.sendMessage(Component.text("Failed! Requires minimum 1 argument: <username> (<hours> <reason>)"));
             return;
         }
-        String username = args[0];
-        String password = args[1];
-        String ipAddress = args[2];
+        String username = args.get(0);
+        long timestampExpires = args.get(1) != null ? System.currentTimeMillis() + (Long.parseLong(args.get(1)) * 3600000) :
+                System.currentTimeMillis() + 86400000; // 24h
+        String reason = args.get(2) != null ? args.toPrintString(2, args.length-1) : "Your behavior violated our community guidelines and/or terms of service.";
+
         try {
-                                                                                                                                                                                    String error = execute(username, password, ipAddress);
+            Player bannedPlayer = Main.INSTANCE.findPlayerByUsername(username);
+            String error = execute(username, bannedPlayer.getUniqueId().toString(),
+                    Main.INSTANCE.getPlayerIp(bannedPlayer), timestampExpires, reason);
             if (error == null) {
                 source.sendMessage(Component.text("Login success!"));
             } else {
@@ -57,14 +62,14 @@ public final class BanCommand implements Command {
     @Override
     public String execute(Object... args) throws Exception {
         if (args.length != 5)
-            return "Failed! Required 4 arguments: <username> <uuid> <ip-address> <timestamp-expires> <reason>";
+            return "Failed! Required 5 arguments: <username> <uuid> <ip-address> <timestamp-expires> <reason>";
         String username = ((String) args[0]).trim();
         String uuid = ((String) args[1]).trim();
         String ipAddress = ((String) args[2]).trim();
         long timestampExpires = args[3] instanceof String ?
                 Long.parseLong(((String) args[3])) : (long) args[3];
         String reason = ((String) args[4]).trim();
-        if (BannedUser.isBanned(uuid, ipAddress))
+        if (BannedUser.isBanned(ipAddress, uuid))
             return "Failed! Already banned player.";
         try {
             BannedUser.add(BannedUser.create(username, ipAddress, timestampExpires, uuid, reason));

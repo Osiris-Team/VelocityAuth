@@ -134,10 +134,8 @@ public class Main {
         });
         proxy.getEventManager().register(this, LoginEvent.class, PostOrder.FIRST, e -> {
             try {
-                if(BannedUser.isBanned(e.getPlayer().getUniqueId().toString(),
-                        e.getPlayer().getRemoteAddress().getAddress().getHostAddress())){
-                    BannedUser bannedUser = BannedUser.getBannedUUIDs(e.getPlayer().getUniqueId().toString())
-                            .get(0);
+                if(BannedUser.isBanned(getPlayerIp(e.getPlayer()), e.getPlayer().getUniqueId().toString())){
+                    BannedUser bannedUser = BannedUser.getBanned(getPlayerIp(e.getPlayer()), e.getPlayer().getUniqueId().toString());
                     Component message = new BanCommand().getBanText(bannedUser.timestampExpires, bannedUser.reason);
                     e.getPlayer().disconnect(message);
                     logger.info("Blocked connection for " + e.getPlayer().getUsername()+"/"+e.getPlayer().getUniqueId().toString()

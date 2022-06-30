@@ -1,5 +1,4 @@
 package com.osiris.velocityauth.database;
-
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.*;
@@ -18,10 +17,10 @@ public class BannedUser{
                 s.executeUpdate("ALTER TABLE `BannedUser` MODIFY COLUMN ipAddress TEXT NOT NULL");
                 try{s.executeUpdate("ALTER TABLE `BannedUser` ADD COLUMN timestampExpires BIGINT NOT NULL");}catch(Exception ignored){}
                 s.executeUpdate("ALTER TABLE `BannedUser` MODIFY COLUMN timestampExpires BIGINT NOT NULL");
+                try{s.executeUpdate("ALTER TABLE `BannedUser` ADD COLUMN reason TEXT NOT NULL");}catch(Exception ignored){}
+                s.executeUpdate("ALTER TABLE `BannedUser` MODIFY COLUMN reason TEXT NOT NULL");
                 try{s.executeUpdate("ALTER TABLE `BannedUser` ADD COLUMN uuid TEXT NOT NULL");}catch(Exception ignored){}
                 s.executeUpdate("ALTER TABLE `BannedUser` MODIFY COLUMN uuid TEXT NOT NULL");
-                try{s.executeUpdate("ALTER TABLE `BannedUser` ADD COLUMN reason TEXT");}catch(Exception ignored){}
-                s.executeUpdate("ALTER TABLE `BannedUser` MODIFY COLUMN reason TEXT");
             }
             try (PreparedStatement ps = con.prepareStatement("SELECT id FROM `BannedUser` ORDER BY id DESC LIMIT 1")) {
                 ResultSet rs = ps.executeQuery();
@@ -36,16 +35,8 @@ public class BannedUser{
      if you plan to add this object to the database in the future, since
      that method fetches and sets/reserves the {@link #id}.
      */
-    public BannedUser (int id, String username, String ipAddress, long timestampExpires, String uuid){
-        this.id = id;this.username = username;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;this.uuid = uuid;
-    }
-    /**
-     Use the static create method instead of this constructor,
-     if you plan to add this object to the database in the future, since
-     that method fetches and sets/reserves the {@link #id}.
-     */
-    public BannedUser (int id, String username, String ipAddress, long timestampExpires, String uuid, String reason){
-        this.id = id;this.username = username;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;this.uuid = uuid;this.reason = reason;
+    public BannedUser (int id, String username, String ipAddress, long timestampExpires, String reason, String uuid){
+        this.id = id;this.username = username;this.ipAddress = ipAddress;this.timestampExpires = timestampExpires;this.reason = reason;this.uuid = uuid;
     }
     /**
      Database field/value. Not null. <br>
@@ -66,25 +57,18 @@ public class BannedUser{
     /**
      Database field/value. Not null. <br>
      */
-    public String uuid;
-    /**
-     Database field/value. <br>
-     */
     public String reason;
+    /**
+     Database field/value. Not null. <br>
+     */
+    public String uuid;
     /**
      Increments the id and sets it for this object (basically reserves a space in the database).
      @return object with latest id. Should be added to the database next by you.
      */
-    public static BannedUser create( String username, String ipAddress, long timestampExpires, String uuid) {
+    public static BannedUser create( String username, String ipAddress, long timestampExpires, String reason, String uuid) {
         int id = idCounter.getAndIncrement();
-        BannedUser obj = new BannedUser(id, username, ipAddress, timestampExpires, uuid);
-        return obj;
-    }
-
-    public static BannedUser create( String username, String ipAddress, long timestampExpires, String uuid, String reason) {
-        int id = idCounter.getAndIncrement();
-        BannedUser obj = new BannedUser();
-        obj.id=id; obj.username=username; obj.ipAddress=ipAddress; obj.timestampExpires=timestampExpires; obj.uuid=uuid; obj.reason=reason;
+        BannedUser obj = new BannedUser(id, username, ipAddress, timestampExpires, reason, uuid);
         return obj;
     }
 
@@ -110,7 +94,7 @@ public class BannedUser{
     public static List<BannedUser> get(String where, Object... whereValues) throws Exception {
         List<BannedUser> list = new ArrayList<>();
         try (PreparedStatement ps = con.prepareStatement(
-                "SELECT id,username,ipAddress,timestampExpires,uuid,reason" +
+                "SELECT id,username,ipAddress,timestampExpires,reason,uuid" +
                         " FROM `BannedUser`" +
                         (where != null ? ("WHERE "+where) : ""))) {
             if(where!=null && whereValues!=null)
@@ -126,8 +110,8 @@ public class BannedUser{
                 obj.username = rs.getString(2);
                 obj.ipAddress = rs.getString(3);
                 obj.timestampExpires = rs.getLong(4);
-                obj.uuid = rs.getString(5);
-                obj.reason = rs.getString(6);
+                obj.reason = rs.getString(5);
+                obj.uuid = rs.getString(6);
             }
         }
         return list;
@@ -140,13 +124,13 @@ public class BannedUser{
      */
     public static void update(BannedUser obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "UPDATE `BannedUser` SET id=?,username=?,ipAddress=?,timestampExpires=?,uuid=?,reason=?")) {
+                "UPDATE `BannedUser` SET id=?,username=?,ipAddress=?,timestampExpires=?,reason=?,uuid=?")) {
             ps.setInt(1, obj.id);
             ps.setString(2, obj.username);
             ps.setString(3, obj.ipAddress);
             ps.setLong(4, obj.timestampExpires);
-            ps.setString(5, obj.uuid);
-            ps.setString(6, obj.reason);
+            ps.setString(5, obj.reason);
+            ps.setString(6, obj.uuid);
             ps.executeUpdate();
         }
     }
@@ -156,13 +140,13 @@ public class BannedUser{
      */
     public static void add(BannedUser obj) throws Exception {
         try (PreparedStatement ps = con.prepareStatement(
-                "INSERT INTO `BannedUser` (id,username,ipAddress,timestampExpires,uuid,reason) VALUES (?,?,?,?,?,?)")) {
+                "INSERT INTO `BannedUser` (id,username,ipAddress,timestampExpires,reason,uuid) VALUES (?,?,?,?,?,?)")) {
             ps.setInt(1, obj.id);
             ps.setString(2, obj.username);
             ps.setString(3, obj.ipAddress);
             ps.setLong(4, obj.timestampExpires);
-            ps.setString(5, obj.uuid);
-            ps.setString(6, obj.reason);
+            ps.setString(5, obj.reason);
+            ps.setString(6, obj.uuid);
             ps.executeUpdate();
         }
     }
@@ -193,20 +177,25 @@ public class BannedUser{
     }
 
     public BannedUser clone(){
-        return new BannedUser(this.id,this.username,this.ipAddress,this.timestampExpires,this.uuid,this.reason);
+        return new BannedUser(this.id,this.username,this.ipAddress,this.timestampExpires,this.reason,this.uuid);
     }
     public String toPrintString(){
-        return  ""+"id="+this.id+" "+"username="+this.username+" "+"ipAddress="+this.ipAddress+" "+"timestampExpires="+this.timestampExpires+" "+"uuid="+this.uuid+" "+"reason="+this.reason+" ";
+        return  ""+"id="+this.id+" "+"username="+this.username+" "+"ipAddress="+this.ipAddress+" "+"timestampExpires="+this.timestampExpires+" "+"reason="+this.reason+" "+"uuid="+this.uuid+" ";
     }
 
 
-
-    public static boolean isBanned(String uuid, String ipAddress) throws Exception {
-        return !getBannedUUIDs(uuid).isEmpty() && !getBannedIpAddresses(ipAddress).isEmpty();
+    public static boolean isBanned(String ipAddress, String uuid) throws Exception {
+        return getBanned(ipAddress, uuid) != null;
     }
 
-    public static List<BannedUser> getBannedUUIDs(String uuid) throws Exception {
-        return get("uuid=? AND timestampExpires>?", uuid, System.currentTimeMillis());
+    public static BannedUser getBanned(String ipAddress, String uuid) throws Exception{
+        List<BannedUser> bannedUsers = get("(ipAddress=? OR uuid=?) AND timestampExpires>?", ipAddress,
+                uuid, System.currentTimeMillis());
+        if(bannedUsers.isEmpty()) return null;
+        if(bannedUsers.size() > 1)
+            throw new RuntimeException("There cannot be multiple("+bannedUsers.size()+") banned users with the same ipAddress("+
+                    ipAddress+") or UUID("+uuid+")! Please fix this.");
+        return bannedUsers.get(0);
     }
 
     public static List<BannedUser> getBannedUsernames(String username) throws Exception {

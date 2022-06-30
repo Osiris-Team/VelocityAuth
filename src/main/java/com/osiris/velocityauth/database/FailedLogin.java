@@ -17,8 +17,8 @@ public class FailedLogin{
                 s.executeUpdate("ALTER TABLE `FailedLogin` MODIFY COLUMN ipAddress TEXT NOT NULL");
                 try{s.executeUpdate("ALTER TABLE `FailedLogin` ADD COLUMN timestamp BIGINT NOT NULL");}catch(Exception ignored){}
                 s.executeUpdate("ALTER TABLE `FailedLogin` MODIFY COLUMN timestamp BIGINT NOT NULL");
-                try{s.executeUpdate("ALTER TABLE `FailedLogin` ADD COLUMN reason TEXT");}catch(Exception ignored){}
-                s.executeUpdate("ALTER TABLE `FailedLogin` MODIFY COLUMN reason TEXT");
+                try{s.executeUpdate("ALTER TABLE `FailedLogin` ADD COLUMN reason TEXT NOT NULL");}catch(Exception ignored){}
+                s.executeUpdate("ALTER TABLE `FailedLogin` MODIFY COLUMN reason TEXT NOT NULL");
                 try{s.executeUpdate("ALTER TABLE `FailedLogin` ADD COLUMN uuid TEXT NOT NULL");}catch(Exception ignored){}
                 s.executeUpdate("ALTER TABLE `FailedLogin` MODIFY COLUMN uuid TEXT NOT NULL");
             }
@@ -30,14 +30,6 @@ public class FailedLogin{
         catch(Exception e){ throw new RuntimeException(e); }
     }
     private FailedLogin(){}
-    /**
-     Use the static create method instead of this constructor,
-     if you plan to add this object to the database in the future, since
-     that method fetches and sets/reserves the {@link #id}.
-     */
-    public FailedLogin (int id, String username, String ipAddress, long timestamp, String uuid){
-        this.id = id;this.username = username;this.ipAddress = ipAddress;this.timestamp = timestamp;this.uuid = uuid;
-    }
     /**
      Use the static create method instead of this constructor,
      if you plan to add this object to the database in the future, since
@@ -63,7 +55,7 @@ public class FailedLogin{
      */
     public long timestamp;
     /**
-     Database field/value. <br>
+     Database field/value. Not null. <br>
      */
     public String reason;
     /**
@@ -74,16 +66,9 @@ public class FailedLogin{
      Increments the id and sets it for this object (basically reserves a space in the database).
      @return object with latest id. Should be added to the database next by you.
      */
-    public static FailedLogin create( String username, String ipAddress, long timestamp, String uuid) {
-        int id = idCounter.getAndIncrement();
-        FailedLogin obj = new FailedLogin(id, username, ipAddress, timestamp, uuid);
-        return obj;
-    }
-
     public static FailedLogin create( String username, String ipAddress, long timestamp, String reason, String uuid) {
         int id = idCounter.getAndIncrement();
-        FailedLogin obj = new FailedLogin();
-        obj.id=id; obj.username=username; obj.ipAddress=ipAddress; obj.timestamp=timestamp; obj.reason=reason; obj.uuid=uuid;
+        FailedLogin obj = new FailedLogin(id, username, ipAddress, timestamp, reason, uuid);
         return obj;
     }
 
