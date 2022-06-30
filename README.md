@@ -11,8 +11,8 @@ Secure your velocity proxy within 3 steps (1.19 support)
   - SQL database support.
   - Session based authentication (players only need to login once).
   - Pre-configured, auto-installed and auto-started limbo auth-server.
-  - Whitelist mode to completely block not registered players from joining.
   - Ban system, to block players from joining your proxy.
+  - Whitelist mode to completely block not registered players from joining.
 - Security
   - Connections to other servers are blocked, if the player is not logged in, and  get automatically forwarded to the limbo auth-server (in spectator mode).
   - Blocks all proxy command execution for not logged in players (except the /register and /login commands)
