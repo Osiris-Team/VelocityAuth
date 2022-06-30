@@ -68,14 +68,13 @@ public final class AdminLoginCommand implements Command {
         if (registeredUsers.size() > 1)
             throw new Exception("There are multiple (" + registeredUsers.size() + ") registered players named '" + username
                     + "'! Its highly recommended to fix this issue.");
-        if (!new Pbkdf2PasswordEncoder().matches(password, registeredUsers.get(0).password))
+        RegisteredUser user = registeredUsers.get(0);
+        if (!new Pbkdf2PasswordEncoder().matches(password, user.password))
             return "Failed! Invalid credentials!";
         // Login success
         try {
             Thread.sleep(new Random().nextInt(1000)); // Prevent password spoofing via timings
             long now = System.currentTimeMillis();
-            RegisteredUser user = registeredUsers.get(0);
-            RegisteredUser.update(user);
             List<Session> sessions = Session.get("username=? AND ipAddress=?", user.username, ipAddress);
             Session session = null;
             if (sessions.isEmpty()) {

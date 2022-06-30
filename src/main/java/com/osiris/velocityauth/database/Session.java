@@ -25,7 +25,7 @@ public class Session{
             }
             try (PreparedStatement ps = con.prepareStatement("SELECT id FROM `Session` ORDER BY id DESC LIMIT 1")) {
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) idCounter.set(rs.getInt(1));
+                if (rs.next()) idCounter.set(rs.getInt(1) + 1);
             }
         }
         catch(Exception e){ throw new RuntimeException(e); }
@@ -76,13 +76,13 @@ public class Session{
      @return object with latest id. Should be added to the database next by you.
      */
     public static Session create( int userId, String ipAddress, long timestampExpires, String username) {
-        int id = idCounter.incrementAndGet();
+        int id = idCounter.getAndIncrement();
         Session obj = new Session(id, userId, ipAddress, timestampExpires, username);
         return obj;
     }
 
     public static Session create( int userId, String ipAddress, long timestampExpires, byte isActive, String username) {
-        int id = idCounter.incrementAndGet();
+        int id = idCounter.getAndIncrement();
         Session obj = new Session();
         obj.id=id; obj.userId=userId; obj.ipAddress=ipAddress; obj.timestampExpires=timestampExpires; obj.isActive=isActive; obj.username=username;
         return obj;

@@ -24,7 +24,7 @@ public class FailedLogin{
             }
             try (PreparedStatement ps = con.prepareStatement("SELECT id FROM `FailedLogin` ORDER BY id DESC LIMIT 1")) {
                 ResultSet rs = ps.executeQuery();
-                if (rs.next()) idCounter.set(rs.getInt(1));
+                if (rs.next()) idCounter.set(rs.getInt(1) + 1);
             }
         }
         catch(Exception e){ throw new RuntimeException(e); }
@@ -75,13 +75,13 @@ public class FailedLogin{
      @return object with latest id. Should be added to the database next by you.
      */
     public static FailedLogin create( String username, String ipAddress, long timestamp, String uuid) {
-        int id = idCounter.incrementAndGet();
+        int id = idCounter.getAndIncrement();
         FailedLogin obj = new FailedLogin(id, username, ipAddress, timestamp, uuid);
         return obj;
     }
 
     public static FailedLogin create( String username, String ipAddress, long timestamp, String reason, String uuid) {
-        int id = idCounter.incrementAndGet();
+        int id = idCounter.getAndIncrement();
         FailedLogin obj = new FailedLogin();
         obj.id=id; obj.username=username; obj.ipAddress=ipAddress; obj.timestamp=timestamp; obj.reason=reason; obj.uuid=uuid;
         return obj;
@@ -194,7 +194,6 @@ public class FailedLogin{
     public FailedLogin clone(){
         return new FailedLogin(this.id,this.username,this.ipAddress,this.timestamp,this.reason,this.uuid);
     }
-
     public String toPrintString(){
         return  ""+"id="+this.id+" "+"username="+this.username+" "+"ipAddress="+this.ipAddress+" "+"timestamp="+this.timestamp+" "+"reason="+this.reason+" "+"uuid="+this.uuid+" ";
     }
