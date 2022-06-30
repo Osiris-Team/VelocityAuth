@@ -63,6 +63,10 @@ Secure your velocity proxy within 3 steps (1.19 support)
   checked and if there is a match for the UUID OR IP,
   the connection is aborted.
 
+#### /unban _username_
+- `velocityauth.unban`
+- Unbans the player, by setting the ban expires timestamp to the current time.
+
 #### /list_sessions _(username)_
 - `velocityauth.list.sessions`
 - Lists all sessions, or the sessions for a specific player.

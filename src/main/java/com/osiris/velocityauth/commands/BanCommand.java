@@ -32,7 +32,7 @@ public final class BanCommand implements Command {
             String error = execute(username, bannedPlayer.getUniqueId().toString(),
                     Main.INSTANCE.getPlayerIp(bannedPlayer), timestampExpires, reason);
             if (error == null) {
-                source.sendMessage(Component.text("Login success!"));
+                source.sendMessage(Component.text("Ban success!"));
             } else {
                 source.sendMessage(Component.text(error, TextColor.color(255, 0, 0)));
                 return;

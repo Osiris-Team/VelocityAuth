@@ -67,7 +67,10 @@ public class Main {
     }
 
     @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) throws NotLoadedException, YamlReaderException, YamlWriterException, IOException, IllegalKeyException, DuplicateKeyException, IllegalListException, URISyntaxException {
+    public void onProxyInitialization(ProxyInitializeEvent event)
+            throws NotLoadedException, YamlReaderException, YamlWriterException,
+            IOException, IllegalKeyException, DuplicateKeyException,
+            IllegalListException, URISyntaxException {
         long now = System.currentTimeMillis();
         long start = System.currentTimeMillis();
         Config config = new Config();
@@ -253,6 +256,7 @@ public class Main {
         new RegisterCommand().register();
         new LoginCommand().register();
         new BanCommand().register();
+        new UnbanCommand().register();
         new ListSessionsCommand().register();
         new ClearSessionsCommand().register();
         logger.info("Commands registered. " + (System.currentTimeMillis() - now) + "ms");
