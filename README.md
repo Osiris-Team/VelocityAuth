@@ -58,7 +58,7 @@ Secure your velocity proxy within 3 steps (1.19 support)
 #### /ban _username_ (_hours_) (_reason_)
 - `velocityauth.ban`
 - Bans the player for 24h, with default reason: Your behavior violated our community guidelines and/or terms of service.
-  The UUID and IP of the player get added to 
+  The UUID and IP of the player gets added to 
   the banned players table. On each player join that table gets
   checked and if there is a match for the UUID OR IP,
   the connection is aborted.
