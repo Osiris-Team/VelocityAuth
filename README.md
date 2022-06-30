@@ -62,7 +62,7 @@ Authenticate players on your velocity proxy (1.19 support)
   the connection is aborted.
 
 #### /list_sessions _(username)_
--`velocityauth.list.sessions`
+- `velocityauth.list.sessions`
 - Lists all sessions. 
 - Lists sessions for the specified player, if username provided.
 
