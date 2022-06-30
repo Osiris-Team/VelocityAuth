@@ -27,13 +27,13 @@ Authenticate players on your velocity proxy (1.19 support)
 ## Player commands
 
 #### /register _password_ _confirm-password_
-- Registers the player.
-- Permission: `velocityauth.register` (Players have this permission by default when not logged in.)
+- `velocityauth.register`
+- Registers the player. (Players have this permission by default when not logged in.)
 
 #### /login _password_
+- `velocityauth.login`
 - Logins the player. On success, forwards the player to the first server, restores permissions, creates a session
-  so this player can rejoin without needing to login again.
-- Permission: `velocityauth.login` (Players have this permission by default when not logged in.)
+  so this player can rejoin without needing to login again. (Players have this permission by default when not logged in.)
 - Details: Failed logins get saved to a table, together with 
   the UUID and IP of the player. If there are more than 5 failed attempts
   in the last hour, the player gets banned for 10 seconds on each
@@ -42,31 +42,31 @@ Authenticate players on your velocity proxy (1.19 support)
 ## Admin commands
 
 #### /a_register _username_ _password_
+- `velocityauth.admin.register`
 - Registers the provided player.
-- Permission: `velocityauth.admin.register`
 
 #### /a_unregister _username_
-- Unregisters the provided player. 
-- Permission: `velocityauth.admin.unregister`
+- `velocityauth.admin.unregister`
+- Unregisters the provided player.
 
 #### /a_login _username_ _password_
+- `velocityauth.admin.login`
 - Logins the provided player.
-- Permission: `velocityauth.admin.login`
 
 #### /ban _username_ (_hours_) (_reason_)
+- `velocityauth.ban`
 - Bans the player for 24h, with default reason: Your behavior violated our community guidelines and/or terms of service.
-- Permission: `velocityauth.ban`
 - Details: The UUID and IP of the player get added to 
   the banned players table. On each player join that table gets
   checked and if there is a match for the UUID OR IP,
   the connection is aborted.
 
 #### /list_sessions _(username)_
+-`velocityauth.list.sessions`
 - Lists all sessions. 
 - Lists sessions for the specified player, if username provided.
-- Permission: `velocityauth.list.sessions`
 
 #### /clear_sessions _(username)_
+- `velocityauth.clear.sessions`
 - Removes/Clears all sessions from the database.
 - Removes/Clears all sessions from the database for the specified player, if username provided.
-- Permission: `velocityauth.clear.sessions`
