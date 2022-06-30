@@ -1,6 +1,11 @@
 # VelocityAuth
 Secure your velocity proxy within 3 steps (1.19 support)
 
+## Usage
+1. Download `VelocityAuth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
+2. Put the jar into your velocity /plugins folder.
+3. Start your velocity server/proxy.
+
 ## Features
 - Basics
   - SQL database support.
@@ -17,12 +22,6 @@ Secure your velocity proxy within 3 steps (1.19 support)
   - Secured against password timing attacks.
   - Secured against password spamming attacks, by temp-banning those players (configurable).
   - Secured against SQL injection.
-
-
-## Usage
-1. Download `VelocityAuth.jar` from the latest release [here](https://github.com/Osiris-Team/VelocityAuth/releases).
-2. Put the jar into your velocity /plugins folder.
-3. Start your velocity server/proxy.
 
 ## Player commands
 
