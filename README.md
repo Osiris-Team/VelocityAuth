@@ -7,7 +7,7 @@ Secure your velocity proxy within 3 steps (1.19 support)
 3. Start your velocity server/proxy.
 
 Note that your velocity config needs to have
-these `player-info-forwarding-mode = "modern"`
+`player-info-forwarding-mode = "modern"`
 and `force-key-authentication = false`
 to work properly with VelocityAuth.
 
